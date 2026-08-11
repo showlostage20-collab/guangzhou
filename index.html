@@ -931,8 +931,8 @@ function initFirebaseSync(){
         splitRef.set(splitData);
       }
       firebaseReady = true;
-      updateSyncBadge('synced');
       refreshSplitPanel();
+      updateSyncBadge('synced');
     }, (err)=>{
       clearTimeout(connectTimeout);
       console.warn('Firebase 讀取失敗', err);
