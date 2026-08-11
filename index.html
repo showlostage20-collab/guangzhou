@@ -318,6 +318,30 @@
   .settle-item .ic{font-size:15px;}
   .settle-item b{color:var(--red-deep);}
   .settle-item b.to{color:var(--jade);}
+
+  /* 類別統計：格狀卡片 */
+  .cat-grid{display:grid; grid-template-columns:repeat(2, 1fr); gap:8px;}
+  .cat-card{
+    background:#fff; border:1.5px solid var(--line); border-radius:10px; padding:10px 12px;
+    display:flex; flex-direction:column; gap:2px;
+  }
+  .cat-card .cat-label{font-size:12px; color:#6b6b72; display:flex; align-items:center; gap:5px;}
+  .cat-card .cat-amt{font-family:'Noto Serif TC',serif; font-weight:900; font-size:16px; color:var(--ink);}
+  .cat-card.has-amt{border-color:var(--gold); background:#FFFBF0;}
+
+  /* 概覽快篩按鈕 */
+  .quick-jump{display:flex; gap:8px; overflow-x:auto; margin:-4px 0 16px; padding-bottom:2px;}
+  .quick-jump a{
+    flex:0 0 auto; font-size:12px; font-weight:700; text-decoration:none; color:var(--ink);
+    background:var(--paper2); border:1.5px solid var(--ink); border-radius:20px; padding:6px 12px;
+    white-space:nowrap;
+  }
+
+  /* 花費紀錄展開/收合 */
+  .toggle-list-btn{
+    width:100%; margin-top:4px; padding:10px; border-radius:10px; border:1.5px dashed var(--ink);
+    background:transparent; color:var(--ink); font-weight:700; font-size:12.5px; font-family:inherit; cursor:pointer;
+  }
   .deposit-row{display:flex; align-items:center; justify-content:space-between; padding:6px 0; gap:10px;}
   .deposit-row .name{font-weight:700; font-size:13.5px; display:flex; align-items:center; gap:4px;}
   .head-badge{font-size:10.5px; font-weight:700; color:var(--jade); background:rgba(31,122,92,0.1); border-radius:20px; padding:2px 7px;}
@@ -885,6 +909,7 @@ const defaultSplitData = {
 };
 let splitData = JSON.parse(JSON.stringify(defaultSplitData));
 let editingExpenseId = null;
+let showAllExpenses = false;
 
 function newExpenseId(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
 
@@ -1055,9 +1080,10 @@ function refreshSplitPanel(){
   const settlements = computeSettlements(balance);
   const catTotals = computeCategoryTotals();
 
-  const catStatsHtml = expenseCategories.map(c=>`
-    <div class="balance-row"><span class="name">${c.emoji} ${c.label}</span><span>${fmtMoney(catTotals[c.key]||0)}</span></div>
-  `).join('');
+  const catStatsHtml = expenseCategories.map(c=>{
+    const amt = catTotals[c.key]||0;
+    return `<div class="cat-card ${amt>0?'has-amt':''}"><span class="cat-label">${c.emoji} ${c.label}</span><span class="cat-amt">${fmtMoney(amt)}</span></div>`;
+  }).join('');
 
   const categoryOptionsForEdit = (selected)=> expenseCategories.map(c=>`<option value="${c.key}" ${c.key===selected?'selected':''}>${c.emoji} ${c.label}</option>`).join('');
   const payerOptionsForEdit = (selected)=> `<option value="${POOL_KEY}" ${selected===POOL_KEY?'selected':''}>💰 公帳（訂金支付）</option>` +
@@ -1066,9 +1092,14 @@ function refreshSplitPanel(){
     `<label class="split-check"><input type="checkbox" value="${m}" ${selectedArr.includes(m)?'checked':''}> ${m}（${headOf(m)}人）</label>`
   ).join('');
 
+  const sortedExpenses = splitData.expenses.slice().sort((a,b)=> (b.date||'').localeCompare(a.date||'') || String(b.id).localeCompare(String(a.id)));
+  const COLLAPSE_LIMIT = 5;
+  const visibleExpenses = showAllExpenses ? sortedExpenses : sortedExpenses.slice(0, COLLAPSE_LIMIT);
+  const hasMoreExpenses = sortedExpenses.length > COLLAPSE_LIMIT;
+
   const expenseListHtml = splitData.expenses.length===0
     ? `<div class="empty-hint">還沒有任何花費紀錄，新增一筆試試看吧</div>`
-    : splitData.expenses.slice().sort((a,b)=> (b.date||'').localeCompare(a.date||'') || String(b.id).localeCompare(String(a.id))).map(exp=>{
+    : visibleExpenses.map(exp=>{
         if(editingExpenseId===exp.id){
           return `
           <div class="expense-item editing">
@@ -1121,7 +1152,7 @@ function refreshSplitPanel(){
             <button class="del-exp" data-del-exp="${exp.id}">🗑 刪除</button>
           </div>
         </div>`;
-      }).join('');
+      }).join('') + (hasMoreExpenses ? `<button class="toggle-list-btn" id="toggleExpBtn">${showAllExpenses ? '▲ 只顯示最近 '+COLLAPSE_LIMIT+' 筆' : '▼ 顯示全部 '+sortedExpenses.length+' 筆'}</button>` : '');
 
   const balanceRows = splitData.members.map(m=>{
     const v = Math.round((balance[m]||0)*100)/100;
@@ -1191,14 +1222,14 @@ function refreshSplitPanel(){
       </div>
     </div>
 
-    <div class="split-section">
-      <h3>花費紀錄</h3>
-      ${expenseListHtml}
+    <div class="quick-jump">
+      <a href="#sec-summary">📊 看總覽／結算</a>
+      <a href="#sec-list">🧾 看花費明細</a>
     </div>
 
-    <div class="split-section">
+    <div class="split-section" id="sec-summary">
       <h3>依類別統計</h3>
-      <div class="summary-card">
+      <div class="cat-grid">
         ${catStatsHtml}
       </div>
     </div>
@@ -1212,6 +1243,11 @@ function refreshSplitPanel(){
       <h3 style="margin-top:6px;">建議轉帳</h3>
       ${settleHtml}
       <button class="submit-btn" id="exportExcelBtn" style="margin-top:14px; background:var(--jade);">📤 匯出成 Excel</button>
+    </div>
+
+    <div class="split-section" id="sec-list">
+      <h3>花費紀錄</h3>
+      ${expenseListHtml}
     </div>
   `;
 
@@ -1332,6 +1368,14 @@ function refreshSplitPanel(){
   });
 
   panel.querySelector('#exportExcelBtn').onclick = exportSplitToExcel;
+
+  const toggleBtn = panel.querySelector('#toggleExpBtn');
+  if(toggleBtn){
+    toggleBtn.onclick = ()=>{
+      showAllExpenses = !showAllExpenses;
+      refreshSplitPanel();
+    };
+  }
 }
 
 function exportSplitToExcel(){
