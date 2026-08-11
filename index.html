@@ -347,6 +347,11 @@
     width:100%; margin-top:4px; padding:10px; border-radius:10px; border:1.5px dashed var(--ink);
     background:transparent; color:var(--ink); font-weight:700; font-size:12.5px; font-family:inherit; cursor:pointer;
   }
+  .deposit-col-labels{display:flex; align-items:center; justify-content:flex-end; padding-bottom:4px; border-bottom:1px dashed var(--line); margin-bottom:2px;}
+  .deposit-col-labels .col-label-group{display:flex; gap:6px;}
+  .deposit-col-labels .col-label{font-size:9.5px; color:#8b8b90; font-weight:700; text-align:center;}
+  .deposit-col-labels .col-label:nth-child(1){width:52px;}
+  .deposit-col-labels .col-label:nth-child(2){width:90px;}
   .deposit-row{display:flex; align-items:center; justify-content:space-between; padding:6px 0; gap:10px;}
   .deposit-row .name{font-weight:700; font-size:13.5px; display:flex; align-items:center; gap:4px;}
   .head-badge{font-size:10.5px; font-weight:700; color:var(--jade); background:rgba(31,122,92,0.1); border-radius:20px; padding:2px 7px;}
@@ -1082,7 +1087,7 @@ function refreshSplitPanel(){
       <span class="name">${m}　<span class="head-badge">👪 ${headOf(m)}人</span></span>
       <span class="deposit-inputs">
         <input type="number" min="1" class="head-input" title="人數" data-head-member="${m}" value="${splitData.headcount[m]||1}">
-        <input type="number" min="0" class="deposit-input" title="訂金" data-deposit-member="${m}" value="${splitData.deposits[m]||0}">
+        <input type="number" min="0" class="deposit-input" title="這一家全家總共繳的訂金（不是單人金額）" placeholder="全家總額" data-deposit-member="${m}" value="${splitData.deposits[m]||0}">
       </span>
     </div>
   `).join('');
@@ -1208,8 +1213,12 @@ function refreshSplitPanel(){
 
     <div class="split-section">
       <h3>各家人數與訂金</h3>
-      <div class="day-note" style="margin:-4px 0 10px;">公帳花費會依各家人數比例分攤，例如 ¥80 由 4 人的林家與各 2 人的吳家、伍家分攤，林家 ¥40、吳家 ¥20、伍家 ¥20</div>
+      <div class="day-note" style="margin:-4px 0 10px;">⚠️ 訂金欄位請填「這一家全家總共繳的金額」，不是每人各繳多少喔！<br>公帳花費會依各家人數比例分攤，例如 ¥80 由 4 人的林家與各 2 人的吳家、伍家分攤，林家 ¥40、吳家 ¥20、伍家 ¥20</div>
       <div class="summary-card">
+        <div class="deposit-col-labels">
+          <span></span>
+          <span class="col-label-group"><span class="col-label">人數</span><span class="col-label">訂金（全家總額）</span></span>
+        </div>
         ${depositRows}
         <div class="total-row" style="margin-top:8px; border-top:1px dashed var(--line); border-bottom:none; padding-top:10px; padding-bottom:0;">
           <span class="label">總人數 ${totalHeadsAll} 人　·　訂金總額</span><span class="value" style="font-size:18px;">${fmtMoney(totalDeposit)}</span>
