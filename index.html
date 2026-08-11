@@ -140,6 +140,10 @@
   }
   .flight-route .arrow,.leg-route .arrow{color:#9a9a9f; font-size:16px; flex:0 0 auto;}
   .leg{border:1.5px dashed var(--line); border-radius:10px; padding:10px; margin-bottom:8px; background:var(--paper);}
+  .leg-type-tag{
+    display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:700; color:var(--blue);
+    background:rgba(43,72,112,0.10); border-radius:20px; padding:3px 9px; margin-bottom:8px;
+  }
   .leg:last-child{margin-bottom:0;}
   .transfer-note{
     display:flex; align-items:center; gap:8px; margin:0 0 8px; font-size:11.5px; color:#8a611b;
@@ -596,16 +600,16 @@ const flightData = {
   outbound:{
     date:'2026-09-24',
     legs:[
-      {from:'臺灣桃園國際機場 T1', to:'香港國際機場 T1', depTime:'10:50', arrTime:'13:00', flight:'國泰航空 CX489'},
-      {from:'香港國際機場 T1', to:'廣州南沙港客運碼頭', depTime:'14:20', arrTime:'15:30', flight:'國泰航空 CX9845／珠江客運 3A（代碼共享）'}
+      {type:'flight', from:'臺灣桃園國際機場 T1', to:'香港國際機場 T1', depTime:'10:50', arrTime:'13:00', flight:'國泰航空 CX489'},
+      {type:'ferry', from:'香港國際機場 T1', to:'廣州南沙港客運碼頭', depTime:'14:20', arrTime:'15:30', flight:'國泰航空 CX9845／珠江客運 3A（代碼共享）'}
     ],
     transfers:['香港國際機場 T1　轉機約 1小時20分鐘（行李可直掛）']
   },
   inbound:{
     date:'2026-09-28',
     legs:[
-      {from:'廣州南沙港客運碼頭', to:'香港國際機場 T1', depTime:'15:50', arrTime:'17:00', flight:'國泰航空 CX9846／珠江客運 3A（代碼共享）'},
-      {from:'香港國際機場 T1', to:'臺灣桃園國際機場 T1', depTime:'19:20', arrTime:'21:20', flight:'國泰航空 CX464'}
+      {type:'ferry', from:'廣州南沙港客運碼頭', to:'香港國際機場 T1', depTime:'15:50', arrTime:'17:00', flight:'國泰航空 CX9846／珠江客運 3A（代碼共享）'},
+      {type:'flight', from:'香港國際機場 T1', to:'臺灣桃園國際機場 T1', depTime:'19:20', arrTime:'21:20', flight:'國泰航空 CX464'}
     ],
     transfers:['香港國際機場 T1　轉機約 2小時20分鐘（行李可直掛）']
   }
@@ -618,11 +622,15 @@ const transportMeta = {
   drive:{icon:'🚗', label:'自駕', cls:'taxi'}
 };
 
+function legIcon(type){ return type==='ferry' ? '⛴️' : '✈️'; }
+function legTypeLabel(type){ return type==='ferry' ? '客船' : '飛機'; }
+
 function renderFlightCard(key, label, cls){
   const f = flightData[key];
   const legsHtml = f.legs.map((leg, i)=>{
     const legBlock = `
       <div class="leg">
+        <div class="leg-type-tag">${legIcon(leg.type)} ${legTypeLabel(leg.type)}</div>
         <div class="leg-route">
           <input class="city" data-flight="${key}" data-leg="${i}" data-legfield="from" value="${leg.from}">
           <span class="arrow">→</span>
@@ -645,16 +653,18 @@ function renderFlightCard(key, label, cls){
       </div>`;
     const transferBlock = (i < f.legs.length-1) ? `
       <div class="transfer-note">
-        <span>✈️→✈️</span>
+        <span>${legIcon(leg.type)}→${legIcon(f.legs[i+1].type)}</span>
         <input type="text" data-flight="${key}" data-transfer="${i}" value="${f.transfers[i]||''}">
       </div>` : '';
     return legBlock + transferBlock;
   }).join('');
 
+  const headerIcon = [...new Set(f.legs.map(l=>legIcon(l.type)))].join('');
+
   return `
     <div class="flight-card ${cls}">
       <div class="flight-head">
-        <span class="plane">✈️</span>
+        <span class="plane">${headerIcon}</span>
         <h3>${label}</h3>
         <span class="badge">${cls==='outbound'?'出發':'返程'}</span>
       </div>
