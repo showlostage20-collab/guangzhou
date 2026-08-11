@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>嗚啦啦廣州順德之旅</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1B1B1F;
+    --paper:#FBF7EF;
+    --paper2:#F1E9D6;
+    --paper3:#EFE6CE;
+    --red:#C4392A;
+    --red-deep:#9E2A1F;
+    --jade:#1F7A5C;
+    --gold:#D89B2E;
+    --blue:#2B4870;
+    --line: rgba(27,27,31,0.12);
+    --shadow: 0 6px 18px rgba(27,27,31,0.10);
+    --radius: 14px;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
+  html,body{margin:0; padding:0; overflow-x:hidden; width:100%;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Noto Sans TC', -apple-system, sans-serif;
+    padding-bottom:96px;
+    background-image:
+      radial-gradient(circle at 100% 0%, rgba(196,57,42,0.06), transparent 40%),
+      radial-gradient(circle at 0% 20%, rgba(31,122,92,0.06), transparent 35%);
+  }
+  h1,h2,h3{font-family:'Noto Serif TC', serif; margin:0;}
+
+  /* ===== Header ===== */
+  .hero{
+    padding:26px 20px 18px;
+    border-bottom:3px solid var(--ink);
+    background:
+      repeating-linear-gradient(135deg, rgba(27,27,31,0.035) 0 2px, transparent 2px 14px),
+      var(--paper);
+    position:relative;
+  }
+  .hero .eyebrow{
+    font-size:12px; letter-spacing:.22em; color:var(--red-deep); font-weight:700;
+    display:flex; align-items:center; gap:8px; margin-bottom:6px;
+  }
+  .hero .eyebrow::before{content:"粵"; font-family:'Noto Serif TC',serif; background:var(--red); color:var(--paper);
+    width:20px;height:20px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;}
+  .hero h1{font-size:26px; font-weight:900; line-height:1.25; letter-spacing:.01em;}
+  .hero h1 span{color:var(--red);}
+  .hero p.sub{margin-top:6px; font-size:13px; color:#5b5b62;}
+  .hero .base-card{
+    margin-top:14px; background:var(--ink); color:var(--paper); border-radius:var(--radius);
+    padding:12px 14px; font-size:12.5px; display:flex; gap:10px; align-items:flex-start;
+    box-shadow: var(--shadow);
+  }
+  .hero .base-card b{color:var(--gold); font-family:'Noto Serif TC',serif; font-size:13px;}
+
+  /* ===== Tabs (stamp style) ===== */
+  .tabbar{
+    position:sticky; top:0; z-index:50;
+    display:flex; gap:8px; overflow-x:auto; padding:12px 14px;
+    background:rgba(251,247,239,0.94); backdrop-filter: blur(6px);
+    border-bottom:1px solid var(--line);
+    -ms-overflow-style: none; scrollbar-width:none;
+  }
+  .tabbar::-webkit-scrollbar{display:none;}
+  .tab{
+    flex:0 0 auto; cursor:pointer; user-select:none;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    width:58px; height:58px; border-radius:10px;
+    border:2px solid var(--ink); background:var(--paper);
+    transform:rotate(-2deg);
+    transition: transform .15s ease, background .15s ease, color .15s ease;
+  }
+  .tab:nth-child(even){transform:rotate(2deg);}
+  .tab .num{font-family:'Noto Serif TC',serif; font-weight:900; font-size:17px; line-height:1;}
+  .tab .cn{font-size:9.5px; letter-spacing:.05em; margin-top:2px;}
+  .tab.active{
+    background:var(--red); border-color:var(--red-deep); color:var(--paper);
+    transform:rotate(0deg) scale(1.05);
+    box-shadow: var(--shadow);
+  }
+  .tab.pack{border-style:dashed;}
+  .tab.pack.active{background:var(--jade); border-color:#134f3b;}
+
+  /* ===== Panels ===== */
+  .panel{display:none; padding:16px 14px 8px;}
+  .panel.active{display:block; animation:fadeIn .25s ease;}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);}}
+
+  .day-title{display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-bottom:4px;}
+  .day-title h2{font-size:20px; font-weight:900;}
+  .day-title .day-note{font-size:12.5px; color:#6b6b72; margin-top:2px;}
+
+  /* Summary card */
+  .summary{
+    margin-top:12px; border-radius:var(--radius); background:var(--paper2);
+    border:1.5px solid var(--ink); padding:12px 14px; display:flex; gap:14px;
+    box-shadow: var(--shadow);
+  }
+  .summary .item{flex:1; text-align:center;}
+  .summary .item .label{font-size:11px; color:#6b6b72; letter-spacing:.04em;}
+  .summary .item .value{font-family:'Noto Serif TC',serif; font-weight:900; font-size:19px; margin-top:2px;}
+  .summary .item.time .value{color:var(--blue);}
+  .summary .item.cost .value{color:var(--red-deep);}
+  .summary .divider{width:1px; background:var(--line);}
+  .summary .hint{width:100%; font-size:10.5px; color:#8b8b90; text-align:center; margin-top:6px;}
+
+  /* Flight cards */
+  .flight-card{
+    border:1.5px solid var(--ink); border-radius:var(--radius); background:#fff;
+    padding:14px; margin-bottom:14px; box-shadow: var(--shadow); position:relative; overflow:visible;
+    width:100%; box-sizing:border-box; max-width:100%;
+  }
+  .flight-card::before{
+    content:""; position:absolute; left:-2px; top:0; bottom:0; width:5px;
+  }
+  .flight-card.outbound::before{background:var(--jade);}
+  .flight-card.inbound::before{background:var(--red);}
+  .flight-card .flight-head{display:flex; align-items:center; gap:8px; margin-bottom:12px;}
+  .flight-card .flight-head .plane{font-size:18px;}
+  .flight-card .flight-head h3{font-size:15px; font-weight:900;}
+  .flight-card .flight-head .badge{
+    margin-left:auto; font-size:10.5px; font-weight:700; padding:3px 9px; border-radius:20px;
+  }
+  .flight-card.outbound .badge{background:rgba(31,122,92,0.12); color:var(--jade);}
+  .flight-card.inbound .badge{background:rgba(196,57,42,0.10); color:var(--red-deep);}
+  .flight-route,.leg-route{display:flex; align-items:center; gap:8px; margin-bottom:10px;}
+  .flight-route input.city,.leg-route input.city{
+    flex:1; min-width:0; width:100%; box-sizing:border-box;
+    border:1.5px solid var(--line); border-radius:8px; padding:8px 6px; font-family:inherit;
+    font-size:12.5px; font-weight:700; text-align:center; color:var(--ink);
+  }
+  .flight-route .arrow,.leg-route .arrow{color:#9a9a9f; font-size:16px; flex:0 0 auto;}
+  .leg{border:1.5px dashed var(--line); border-radius:10px; padding:10px; margin-bottom:8px; background:var(--paper);}
+  .leg:last-child{margin-bottom:0;}
+  .transfer-note{
+    display:flex; align-items:center; gap:8px; margin:0 0 8px; font-size:11.5px; color:#8a611b;
+    background:#FFF7E8; border:1px solid var(--gold); border-radius:8px; padding:7px 10px;
+  }
+  .transfer-note input{
+    flex:1; min-width:0; border:none; background:transparent; font-size:11.5px; color:#8a611b;
+    font-family:inherit; padding:0;
+  }
+  .transfer-note input:focus{outline:none;}
+  .flight-grid{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:10px; width:100%;}
+  .flight-grid .field{display:flex; flex-direction:column; gap:4px; min-width:0;}
+  .flight-grid .field.full{grid-column:1 / -1;}
+  .flight-grid label{font-size:10.5px; color:#8b8b90; letter-spacing:.04em; font-weight:700;}
+  .flight-grid input{
+    width:100%; min-width:0; box-sizing:border-box;
+    border:1.5px solid var(--line); border-radius:8px; padding:9px 8px; font-family:inherit;
+    font-size:13px; color:var(--ink); background:var(--paper);
+  }
+  .flight-grid input:focus{outline:none; border-color:var(--gold);}
+  .flight-grid input::placeholder{color:#b6b6ba; font-size:11.5px;}
+  @media (max-width:360px){
+    .flight-grid{grid-template-columns:1fr;}
+    .flight-grid .field{grid-column:1 / -1;}
+  }
+
+  /* Timeline */
+  .timeline{margin-top:16px; position:relative; padding-left:2px;}
+  .transport-row{
+    display:flex; align-items:center; gap:8px; margin:10px 0 10px 6px; font-size:12px; color:#555;
+  }
+  .transport-row .icon{
+    width:24px;height:24px;border-radius:50%; background:var(--blue); color:#fff; display:flex;
+    align-items:center; justify-content:center; font-size:13px; flex:0 0 auto;
+  }
+  .transport-row.taxi .icon{background:var(--gold); color:var(--ink);}
+  .transport-row.walk .icon{background:#8a8a90;}
+  .transport-row .desc{flex:1; line-height:1.4;}
+  .transport-row .stat{display:flex; gap:4px; align-items:center; flex:0 0 auto;}
+  .transport-row input{
+    width:40px; border:none; border-bottom:1.5px dashed var(--line); background:transparent;
+    font-size:12px; text-align:right; color:var(--ink); font-weight:700; font-family:inherit;
+  }
+  .transport-row input:focus{outline:none; border-color:var(--red);}
+  .transport-row .unit{font-size:10.5px; color:#8b8b90;}
+
+  .stop{
+    border:1.5px solid var(--ink); border-radius:var(--radius); background:#fff;
+    padding:12px 14px; margin-bottom:6px; box-shadow: var(--shadow); position:relative;
+  }
+  .stop::before{
+    content:""; position:absolute; left:-2px; top:14px; bottom:14px; width:4px; border-radius:4px;
+  }
+  .stop.type-spot::before{background:var(--jade);}
+  .stop.type-food::before{background:var(--red);}
+  .stop.type-shop::before{background:var(--gold);}
+  .stop-head{display:flex; align-items:center; gap:10px; cursor:pointer;}
+  .stop-time{
+    font-family:'Noto Serif TC',serif; font-weight:900; font-size:14px; color:var(--paper);
+    background:var(--ink); border-radius:6px; padding:3px 7px; flex:0 0 auto;
+  }
+  .stop-tag{font-size:10px; letter-spacing:.04em; padding:2px 7px; border-radius:20px; flex:0 0 auto; font-weight:700;}
+  .type-spot .stop-tag{background:rgba(31,122,92,0.12); color:var(--jade);}
+  .type-food .stop-tag{background:rgba(196,57,42,0.10); color:var(--red-deep);}
+  .type-shop .stop-tag{background:rgba(216,155,46,0.16); color:#8a611b;}
+  .stop-title{font-weight:700; font-size:15px; flex:1; line-height:1.3;}
+  .stop-arrow{font-size:12px; color:#9a9a9f; transition:transform .2s ease; flex:0 0 auto;}
+  .stop.open .stop-arrow{transform:rotate(90deg);}
+  .stop-body{display:none; margin-top:10px; padding-top:10px; border-top:1px dashed var(--line); font-size:13px; line-height:1.6; color:#3a3a3f;}
+  .stop.open .stop-body{display:block;}
+  .stop-body .note-label{font-size:10.5px; color:var(--jade); font-weight:700; letter-spacing:.04em; margin-bottom:3px;}
+  .contact-row{display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;}
+  .contact-row a{
+    font-size:12px; text-decoration:none; color:var(--blue); background:var(--paper2);
+    padding:5px 10px; border-radius:20px; border:1px solid var(--line); display:inline-flex; gap:5px; align-items:center;
+  }
+  .contact-row a.tel{color:var(--red-deep);}
+  .contact-row a.gaode{color:var(--jade); border-color:rgba(31,122,92,0.35); background:rgba(31,122,92,0.08);}
+
+  [contenteditable="true"]{outline:none; border-bottom:1.5px dashed var(--gold); background:rgba(216,155,46,0.06); border-radius:3px; padding:0 2px;}
+
+  .del-stop{
+    display:none; margin-top:10px; font-size:11.5px; color:var(--red-deep); background:none; border:1px solid var(--red-deep);
+    border-radius:20px; padding:4px 10px; font-family:inherit; cursor:pointer;
+  }
+  body.editing .del-stop{display:inline-block;}
+  body.editing .stop{border-color:var(--red-deep);}
+
+  .add-stop-btn{
+    width:100%; margin-top:8px; padding:12px; border-radius:var(--radius); border:2px dashed var(--ink);
+    background:transparent; color:var(--ink); font-weight:700; font-size:13px; font-family:inherit; cursor:pointer;
+    display:none;
+  }
+  body.editing .add-stop-btn{display:block;}
+
+  .callout{
+    margin:14px 0; background:#FFF7E8; border:1.5px solid var(--gold); border-radius:var(--radius);
+    padding:12px 14px; font-size:12.5px; line-height:1.6; color:#5c4413;
+  }
+  .callout b{color:var(--red-deep);}
+
+  /* Packing list */
+  .pack-cat{margin-bottom:18px;}
+  .pack-cat h3{font-size:15px; color:var(--jade); border-bottom:2px solid var(--jade); display:inline-block; padding-bottom:2px; margin-bottom:8px;}
+  .pack-item{display:flex; align-items:center; gap:10px; padding:9px 4px; border-bottom:1px solid var(--line);}
+  .pack-item input[type=checkbox]{width:19px; height:19px; accent-color:var(--jade); flex:0 0 auto;}
+  .pack-item span{flex:1; font-size:14px;}
+  .pack-item.checked span{text-decoration:line-through; color:#a8a8ac;}
+  .add-item-row{display:flex; gap:8px; margin-top:8px;}
+  .add-item-row input{flex:1; border:1.5px solid var(--line); border-radius:8px; padding:8px 10px; font-family:inherit; font-size:13px;}
+  .add-item-row button{border:none; background:var(--jade); color:#fff; border-radius:8px; padding:0 14px; font-weight:700; font-family:inherit;}
+
+  /* Edit FAB */
+  .fab{
+    position:fixed; right:16px; bottom:20px; z-index:60;
+    width:56px; height:56px; border-radius:50%; background:var(--ink); color:var(--paper);
+    display:flex; align-items:center; justify-content:center; font-size:22px; border:none;
+    box-shadow:0 8px 20px rgba(27,27,31,0.35); cursor:pointer;
+  }
+  .fab.on{background:var(--red);}
+  .edit-banner{
+    display:none; position:sticky; top:82px; z-index:40; margin:0 14px; padding:8px 12px; border-radius:10px;
+    background:var(--red); color:#fff; font-size:12px; text-align:center; font-weight:700;
+  }
+  body.editing .edit-banner{display:block;}
+
+  footer{text-align:center; font-size:11px; color:#9a9a9f; padding:30px 20px 10px;}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="eyebrow">4 DAYS · 广州 · 佛山 · 顺德</div>
+  <h1>嗚啦啦<span>廣州順德</span>之旅</h1>
+  <p class="sub">2026.09.24 – 09.28　老城騎樓 × 批發淘貨 × 廣州塔夜景 × 順德味道 — 全程以打車／地鐵移動</p>
+  <div class="base-card">
+    <span>🏨</span>
+    <div><b>住宿基地：</b>北京路步行街／吾悅廣場民宿，4晚皆以此為出發與回程點。</div>
+  </div>
+</div>
+
+<div class="tabbar" id="tabbar"></div>
+<div class="edit-banner">✏️ 編輯模式已開啟：可直接點文字修改內容，或用下方按鈕新增／刪除行程</div>
+
+<div id="panels"></div>
+
+<button class="fab" id="fab" title="編輯行程">✎</button>
+
+<footer>行程與費用皆為預估值，實際交通時間／車資會依路況與尖離峰浮動，建議出發前用地圖 App 再次確認。</footer>
+
+<script>
+/* ---------------- 資料 ---------------- */
+const tripData = {
+  days: [
+    {
+      id:'d1', num:'壹', label:'DAY 1', date:'09/25', title:'廣州老城　北京路夜市',
+      note:'越秀公園．陳家祠．永慶坊．上下九．北京路',
+      stops:[
+        {time:'09:00', type:'spot', title:'越秀公園', tag:'景點',
+          transport:{mode:'taxi', from:'民宿', min:12, cost:15},
+          note:'廣州地標公園，園內「五羊石像」是廣州「羊城」別稱由來，也是老廣州人假日散步的地方，可順道望見中山紀念碑。'},
+        {time:'11:00', type:'spot', title:'陳家祠', tag:'景點',
+          transport:{mode:'metro', from:'越秀公園', min:20, cost:4},
+          note:'原為清代廣東各地陳氏宗族合資興建的書院「陳氏書院」，以木雕、石雕、磚雕、灰塑、陶塑「五雕」聞名，是嶺南建築藝術的代表作，非常適合拍照。'},
+        {time:'12:30', type:'food', title:'午餐：點都德 / 陶陶居', tag:'必吃',
+          transport:{mode:'taxi', from:'陳家祠', min:10, cost:15},
+          note:'兩間都是廣州代表性早茶品牌。必點：蝦餃皇、紅米腸、叉燒包、蒸排骨、鳳爪、流沙包、腸粉。',
+          address:'點都德：廣州市越秀區北京路352號　／　陶陶居：廣州市越秀區北京路168號附近',
+          phone:'+862083522927'},
+        {time:'14:00', type:'spot', title:'永慶坊', tag:'景點',
+          transport:{mode:'taxi', from:'北京路', min:15, cost:18},
+          note:'荔灣區老西關改造街區，保留西關老屋、騎樓建築，李小龍祖居也在此，現在進駐許多文創小店與咖啡館，是廣州最好拍照的地方之一。'},
+        {time:'16:00', type:'spot', title:'上下九步行街', tag:'景點',
+          transport:{mode:'taxi', from:'永慶坊', min:10, cost:12},
+          note:'老廣州代表性商業步行街，可逛荔灣廣場、西關大屋與各式老字號，是「老廣州＋小吃＋平價購物」的縮影。'},
+        {time:'17:30', type:'food', title:'晚餐：陳添記 / 銀記腸粉店', tag:'必吃',
+          transport:{mode:'walk', from:'上下九', min:5, cost:0},
+          note:'陳添記以魚皮、豬腳薑、艇仔粥聞名；銀記腸粉店則是廣州腸粉老字號，兩者都可步行到達。',
+          address:'陳添記：廣州市荔灣區　／　銀記腸粉店：廣州市越秀區北京路惠福東路519號',
+          phone:'+862083177149'},
+        {time:'19:00', type:'spot', title:'北京路夜市', tag:'夜市／步行街',
+          transport:{mode:'taxi', from:'晚餐地點', min:15, cost:18},
+          note:'必看「北京路千年古道」玻璃地面遺跡；晚上沿路是廣州最熱鬧的步行街之一，可順道逛吾悅廣場，直接走回民宿。'}
+      ]
+    },
+    {
+      id:'d2', num:'貳', label:'DAY 2', date:'09/26', title:'批發購物日',
+      note:'白馬服裝市場．十三行．一德路．三元里皮具',
+      stops:[
+        {time:'09:00', type:'shop', title:'白馬服裝市場', tag:'批發市場',
+          transport:{mode:'taxi', from:'民宿', min:15, cost:20},
+          note:'廣州最具代表性的服裝批發市場之一，營業約 08:00–18:00。適合買女裝、男裝、外套、褲子、毛衣、包包、鞋子，建議越早去越好逛。',
+          address:'廣州市越秀區站南路16號', phone:'-'},
+        {time:'11:30', type:'shop', title:'十三行批發城', tag:'批發市場',
+          transport:{mode:'taxi', from:'白馬市場', min:12, cost:16},
+          note:'偏向年輕女裝、快時尚、平價款式，是廣州快時尚服飾批發的重要集散地。',
+          address:'廣州市荔灣區長堤路購物休閒街興隆北路11號', phone:'-'},
+        {time:'13:30', type:'shop', title:'一德路', tag:'批發街',
+          transport:{mode:'walk', from:'十三行', min:8, cost:0},
+          note:'可逛玩具、禮品、飾品、小商品、食品與節慶用品，很有「批發淘寶街」的氛圍，適合買伴手禮小物。'},
+        {time:'15:00', type:'shop', title:'三元里／白雲皮具市場', tag:'批發市場',
+          transport:{mode:'taxi', from:'一德路', min:20, cost:25},
+          note:'廣州最重要的皮具、包袋、皮帶採購區，例如廣州白雲世界皮具貿易中心。建議挑選標示「無 Logo」「原創款」「同款風格」「頭層牛皮」「工廠貨」的商品，品質實在又不涉及仿冒糾紛。',
+          address:'廣州市白雲區（白雲世界皮具貿易中心）', phone:'+862087674536'},
+        {time:'18:00', type:'spot', title:'返回北京路', tag:'回程',
+          transport:{mode:'taxi', from:'三元里', min:25, cost:30},
+          note:'回民宿稍作休息，把戰利品放下，準備吃晚餐。'},
+        {time:'19:30', type:'spot', title:'北京路晚餐＋購物', tag:'夜市／步行街',
+          transport:{mode:'walk', from:'民宿', min:5, cost:0},
+          note:'路線建議：北京路 → 惠福東路 → 北京路夜市 → 吾悅廣場。晚餐可吃牛雜、雲吞麵、炒河粉、煲仔飯、糖水、雙皮奶。'}
+      ]
+    },
+    {
+      id:'d3', num:'叁', label:'DAY 3', date:'09/27', title:'廣州塔　珠江夜景',
+      note:'沙面島．廣州塔．珠江夜遊．天河商圈',
+      stops:[
+        {time:'09:30', type:'spot', title:'沙面島', tag:'景點',
+          transport:{mode:'taxi', from:'民宿', min:15, cost:18},
+          note:'珠江中的小島，保留大量歐式建築與林蔭大道，是廣州拍照最漂亮的地方之一，適合慢慢散步約 1.5–2 小時。'},
+        {time:'11:30', type:'food', title:'西關午餐', tag:'必吃',
+          transport:{mode:'taxi', from:'沙面島', min:8, cost:12},
+          note:'推薦白切雞、燒鵝、叉燒、乳鴿、雲吞麵，西關一帶老字號選擇多。'},
+        {time:'15:30', type:'spot', title:'廣州塔', tag:'必去地標',
+          transport:{mode:'taxi', from:'西關', min:20, cost:28},
+          note:'俗稱「小蠻腰」，廣州新地標。建議 16:00 左右到，先看白天視野再等天黑。不上塔的話，塔下與珠江邊拍照、看夜景也很值得。',
+          address:'廣州市海珠區閱江西路', phone:'+862089338222'},
+        {time:'18:30', type:'spot', title:'珠江夜景／珠江夜遊', tag:'必去',
+          transport:{mode:'walk', from:'廣州塔', min:5, cost:0},
+          note:'預算允許可搭珠江夜遊船，從江面欣賞兩岸燈光與廣州塔全景，是廣州晚上最推薦的行程之一。'},
+        {time:'20:30', type:'shop', title:'天河商圈：太古匯', tag:'高級商場',
+          transport:{mode:'taxi', from:'珠江邊', min:15, cost:20},
+          note:'太古匯定位精品、國際品牌與高級餐廳，適合拍照逛街；也可續逛天環廣場、正佳廣場、天河城，選擇集中好逛。',
+          address:'廣州市天河區天河路383號', phone:'-'}
+      ]
+    },
+    {
+      id:'d4', num:'肆', label:'DAY 4', date:'09/28', title:'佛山順德　美食日',
+      note:'佛山祖廟．嶺南天地．清暉園．華蓋路．漁人碼頭',
+      stops:[
+        {time:'08:00', type:'spot', title:'出發前往佛山', tag:'交通',
+          transport:{mode:'taxi', from:'民宿', min:45, cost:95},
+          note:'建議 2–4 人可直接打車前往佛山，比轉乘城際更省時間。'},
+        {time:'09:00', type:'spot', title:'佛山祖廟', tag:'景點',
+          transport:{mode:'walk', from:'', min:0, cost:0},
+          note:'佛山代表性景點，可看黃飛鴻、葉問武術文化與嶺南建築工藝，是佛山歷史文化的縮影，安排約 1.5 小時。',
+          address:'佛山市禪城區桂城', phone:'-'},
+        {time:'10:30', type:'spot', title:'嶺南天地', tag:'景點',
+          transport:{mode:'walk', from:'祖廟', min:5, cost:0},
+          note:'比純觀光景區更有生活感的老街區，結合老街、餐廳、咖啡與文創小店，很適合拍照散步。'},
+        {time:'12:00', type:'spot', title:'前往順德大良', tag:'交通',
+          transport:{mode:'taxi', from:'嶺南天地', min:35, cost:65},
+          note:'依路況約 30–40 分鐘車程。'},
+        {time:'13:00', type:'spot', title:'清暉園', tag:'景點',
+          transport:{mode:'walk', from:'', min:0, cost:0},
+          note:'順德代表性嶺南園林，建築與造景精緻，建議停留 1 小時左右，把時間留給後面吃東西。',
+          address:'佛山市順德區清暉路23號', phone:'+8675722226196'},
+        {time:'14:15', type:'spot', title:'華蓋路步行街', tag:'步行街',
+          transport:{mode:'walk', from:'清暉園', min:8, cost:0},
+          note:'順德的美食＋老街＋小吃＋購物集中地，順德甜品與正餐都在附近解決。'},
+        {time:'14:30', type:'food', title:'順德甜品：仁信老舖 / 民信老舖', tag:'必吃',
+          transport:{mode:'walk', from:'華蓋路', min:3, cost:0},
+          note:'順德最經典的雙皮奶、薑撞奶、炸牛奶、倫教糕都在這裡，仁信老舖是大良經典甜品站。',
+          address:'仁信老舖：佛山市順德區東苑路　／　民信老舖：佛山市順德區東樂路', phone:'-'},
+        {time:'16:00', type:'food', title:'順德正餐', tag:'必吃',
+          transport:{mode:'walk', from:'甜品店', min:5, cost:0},
+          note:'必試順德魚（或蒸魚）、燒鵝、順德粥、炒牛奶；順德料理的重點就是「鮮」。'},
+        {time:'18:00', type:'spot', title:'順德漁人碼頭', tag:'夜景／步行街',
+          transport:{mode:'taxi', from:'順德市區', min:10, cost:15},
+          note:'適合拍照、看夜景、吃小吃、喝咖啡，是順德晚上最放鬆的收尾行程。',
+          address:'佛山市順德區東堤路7號', phone:'-'},
+        {time:'20:00', type:'spot', title:'返回廣州北京路', tag:'交通',
+          transport:{mode:'taxi', from:'漁人碼頭', min:50, cost:110},
+          note:'車程約 50 分鐘視路況，回民宿休息，結束 4 天行程。'}
+      ]
+    }
+  ],
+  packing:[
+    {cat:'證件與金錢', items:['護照 / 台胞證 / 身分證','人民幣現金','支付寶／微信支付綁定','信用卡','訂房與交通憑證截圖']},
+    {cat:'電子用品', items:['手機＋充電線','行動電源','轉接頭／插座','相機或耳機']},
+    {cat:'衣物', items:['換洗衣物（依天數＋1）','薄外套（早晚溫差）','好走的鞋子','襪子與內衣物']},
+    {cat:'個人用品', items:['盥洗用品','防曬乳','雨傘或雨衣','摺疊環保購物袋（裝批發戰利品）']},
+    {cat:'藥品', items:['個人常備藥','腸胃藥','OK繃／小藥膏']}
+  ]
+};
+
+const flightData = {
+  outbound:{
+    date:'2026-09-24',
+    legs:[
+      {from:'臺灣桃園國際機場 T1', to:'香港國際機場 T1', depTime:'10:50', arrTime:'13:00', flight:'國泰航空 CX489'},
+      {from:'香港國際機場 T1', to:'廣州南沙港客運碼頭', depTime:'14:20', arrTime:'15:30', flight:'國泰航空 CX9845／珠江客運 3A（代碼共享）'}
+    ],
+    transfers:['香港國際機場 T1　轉機約 1小時20分鐘（行李可直掛）']
+  },
+  inbound:{
+    date:'2026-09-28',
+    legs:[
+      {from:'廣州南沙港客運碼頭', to:'香港國際機場 T1', depTime:'15:50', arrTime:'17:00', flight:'國泰航空 CX9846／珠江客運 3A（代碼共享）'},
+      {from:'香港國際機場 T1', to:'臺灣桃園國際機場 T1', depTime:'19:20', arrTime:'21:20', flight:'國泰航空 CX464'}
+    ],
+    transfers:['香港國際機場 T1　轉機約 2小時20分鐘（行李可直掛）']
+  }
+};
+
+const transportMeta = {
+  taxi:{icon:'🚕', label:'打車', cls:'taxi'},
+  metro:{icon:'🚇', label:'地鐵', cls:'metro'},
+  walk:{icon:'🚶', label:'步行', cls:'walk'}
+};
+
+function renderFlightCard(key, label, cls){
+  const f = flightData[key];
+  const legsHtml = f.legs.map((leg, i)=>{
+    const legBlock = `
+      <div class="leg">
+        <div class="leg-route">
+          <input class="city" data-flight="${key}" data-leg="${i}" data-legfield="from" value="${leg.from}">
+          <span class="arrow">→</span>
+          <input class="city" data-flight="${key}" data-leg="${i}" data-legfield="to" value="${leg.to}">
+        </div>
+        <div class="flight-grid">
+          <div class="field">
+            <label>出發時間</label>
+            <input type="time" data-flight="${key}" data-leg="${i}" data-legfield="depTime" value="${leg.depTime}">
+          </div>
+          <div class="field">
+            <label>抵達時間</label>
+            <input type="time" data-flight="${key}" data-leg="${i}" data-legfield="arrTime" value="${leg.arrTime}">
+          </div>
+          <div class="field full">
+            <label>航空公司／航班號</label>
+            <input type="text" data-flight="${key}" data-leg="${i}" data-legfield="flight" placeholder="尚未確定，訂票後再填入" value="${leg.flight}">
+          </div>
+        </div>
+      </div>`;
+    const transferBlock = (i < f.legs.length-1) ? `
+      <div class="transfer-note">
+        <span>✈️→✈️</span>
+        <input type="text" data-flight="${key}" data-transfer="${i}" value="${f.transfers[i]||''}">
+      </div>` : '';
+    return legBlock + transferBlock;
+  }).join('');
+
+  return `
+    <div class="flight-card ${cls}">
+      <div class="flight-head">
+        <span class="plane">✈️</span>
+        <h3>${label}</h3>
+        <span class="badge">${cls==='outbound'?'出發':'返程'}</span>
+      </div>
+      <div class="flight-grid" style="margin-bottom:12px;">
+        <div class="field full">
+          <label>日期</label>
+          <input type="date" data-flight="${key}" data-field="date" value="${f.date}">
+        </div>
+      </div>
+      ${legsHtml}
+    </div>
+  `;
+}
+
+function bindFlightInputs(){
+  document.querySelectorAll('[data-flight]').forEach(input=>{
+    input.addEventListener('input', ()=>{
+      const key = input.dataset.flight;
+      if(input.dataset.field){
+        flightData[key][input.dataset.field] = input.value;
+      } else if(input.dataset.leg !== undefined){
+        flightData[key].legs[Number(input.dataset.leg)][input.dataset.legfield] = input.value;
+      } else if(input.dataset.transfer !== undefined){
+        flightData[key].transfers[Number(input.dataset.transfer)] = input.value;
+      }
+    });
+  });
+}
+
+/* ---------------- Render ---------------- */
+const tabbar = document.getElementById('tabbar');
+const panelsRoot = document.getElementById('panels');
+
+function render(){
+  tabbar.innerHTML='';
+  panelsRoot.innerHTML='';
+
+  // 航班分頁（放最前面）
+  const flightTab = document.createElement('div');
+  flightTab.className='tab active';
+  flightTab.innerHTML=`<div class="num">✈️</div><div class="cn">航班</div>`;
+  flightTab.onclick=()=>switchPanel('flight');
+  tabbar.appendChild(flightTab);
+
+  const flightPanel = document.createElement('div');
+  flightPanel.className='panel active';
+  flightPanel.id='panel-flight';
+  flightPanel.innerHTML = `
+    <div class="day-title"><div><h2>航班資訊</h2><div class="day-note">去程／回程皆為台北－香港轉機，內容可點擊修改</div></div></div>
+    ${renderFlightCard('outbound','去程','outbound')}
+    ${renderFlightCard('inbound','回程','inbound')}
+  `;
+  panelsRoot.appendChild(flightPanel);
+
+  tripData.days.forEach((day, idx)=>{
+    const tab = document.createElement('div');
+    tab.className='tab';
+    tab.dataset.target=day.id;
+    tab.innerHTML=`<div class="num">${day.num}</div><div class="cn">${day.label}</div>`;
+    tab.onclick=()=>switchPanel(day.id);
+    tabbar.appendChild(tab);
+
+    const panel = document.createElement('div');
+    panel.className='panel';
+    panel.id='panel-'+day.id;
+    panel.innerHTML = `
+      <div class="day-title">
+        <div>
+          <h2 contenteditable="false" data-field="title">${day.title}</h2>
+          <div class="day-note" contenteditable="false" data-field="note">${day.date? '📅 '+day.date+'　':''}${day.note}</div>
+        </div>
+      </div>
+      <div class="summary" data-summary="${day.id}">
+        <div class="item time"><div class="label">交通時間</div><div class="value" data-sum-time>0 分</div></div>
+        <div class="divider"></div>
+        <div class="item cost"><div class="label">交通花費</div><div class="value" data-sum-cost>¥0</div></div>
+      </div>
+      ${idx===1?`<div class="callout"><b>小提醒：</b>批發市場很容易逛到失控，建議帶一個摺疊購物袋，並在「行李清單」分頁記下每樣戰利品的價格與購買地，才不會回頭找不到。市場內請認明「無 Logo／原創款」商品，避免購買仿冒品牌，逛起來更安心。</div>`:''}
+      <div class="timeline" data-day="${day.id}"></div>
+      <button class="add-stop-btn" data-day="${day.id}">＋ 新增一個行程</button>
+    `;
+    panelsRoot.appendChild(panel);
+
+    const timeline = panel.querySelector('.timeline');
+    day.stops.forEach((stop, sIdx)=> timeline.appendChild(renderStop(day, stop, sIdx)));
+  });
+
+  // packing tab
+  const packTab = document.createElement('div');
+  packTab.className='tab pack';
+  packTab.innerHTML=`<div class="num">🎒</div><div class="cn">行李</div>`;
+  packTab.onclick=()=>switchPanel('packing');
+  tabbar.appendChild(packTab);
+
+  const packPanel = document.createElement('div');
+  packPanel.className='panel';
+  packPanel.id='panel-packing';
+  packPanel.innerHTML = `<div class="day-title"><div><h2>行李清單</h2><div class="day-note">出發前打勾確認，項目可自行新增</div></div></div>`;
+  tripData.packing.forEach(cat=>{
+    const catDiv = document.createElement('div');
+    catDiv.className='pack-cat';
+    catDiv.innerHTML = `<h3>${cat.cat}</h3>`;
+    cat.items.forEach(it=> catDiv.appendChild(renderPackItem(it)));
+    const addRow = document.createElement('div');
+    addRow.className='add-item-row';
+    addRow.innerHTML = `<input type="text" placeholder="新增項目...">  <button>加入</button>`;
+    const input = addRow.querySelector('input');
+    addRow.querySelector('button').onclick=()=>{
+      if(input.value.trim()===''){return;}
+      catDiv.insertBefore(renderPackItem(input.value.trim()), addRow);
+      input.value='';
+    };
+    catDiv.appendChild(addRow);
+    packPanel.appendChild(catDiv);
+  });
+  panelsRoot.appendChild(packPanel);
+
+  document.querySelectorAll('.timeline').forEach(t=> updateSummary(t.dataset.day));
+
+  // add-stop buttons
+  document.querySelectorAll('.add-stop-btn').forEach(btn=>{
+    btn.onclick=()=>{
+      const dayId = btn.dataset.day;
+      const day = tripData.days.find(d=>d.id===dayId);
+      const newStop = {time:'--:--', type:'spot', title:'新的行程（點我編輯）', tag:'待編輯',
+        transport:{mode:'taxi', from:'', min:0, cost:0}, note:'點擊展開後可編輯說明文字。'};
+      day.stops.push(newStop);
+      const timeline = document.querySelector(`.timeline[data-day="${dayId}"]`);
+      timeline.appendChild(renderStop(day, newStop, day.stops.length-1));
+      updateSummary(dayId);
+    };
+  });
+}
+
+function renderPackItem(text){
+  const row = document.createElement('div');
+  row.className='pack-item';
+  row.innerHTML = `<input type="checkbox"><span>${text}</span>`;
+  const cb = row.querySelector('input');
+  cb.onchange=()=> row.classList.toggle('checked', cb.checked);
+  return row;
+}
+
+function renderStop(day, stop, idx){
+  const wrap = document.createElement('div');
+
+  const meta = transportMeta[stop.transport.mode];
+  const tRow = document.createElement('div');
+  tRow.className = 'transport-row '+meta.cls;
+  tRow.innerHTML = `
+    <div class="icon">${meta.icon}</div>
+    <div class="desc">${meta.label}${stop.transport.from? '　'+stop.transport.from+' → '+stop.title : ''}</div>
+    <div class="stat">
+      <input type="number" min="0" value="${stop.transport.min}" data-role="min"><span class="unit">分</span>
+      <input type="number" min="0" value="${stop.transport.cost}" data-role="cost"><span class="unit">¥</span>
+    </div>
+  `;
+  const minInput = tRow.querySelector('[data-role="min"]');
+  const costInput = tRow.querySelector('[data-role="cost"]');
+  minInput.oninput=()=>{ stop.transport.min = Number(minInput.value)||0; updateSummary(day.id); };
+  costInput.oninput=()=>{ stop.transport.cost = Number(costInput.value)||0; updateSummary(day.id); };
+  wrap.appendChild(tRow);
+
+  const card = document.createElement('div');
+  card.className = 'stop type-'+stop.type;
+  card.innerHTML = `
+    <div class="stop-head">
+      <div class="stop-time">${stop.time}</div>
+      <div class="stop-tag">${stop.tag}</div>
+      <div class="stop-title" contenteditable="false" data-field="title">${stop.title}</div>
+      <div class="stop-arrow">▶</div>
+    </div>
+    <div class="stop-body">
+      <div class="note-label">簡介／備註</div>
+      <div contenteditable="false" data-field="note">${stop.note||''}</div>
+      <div class="contact-row">
+        <a class="gaode" target="_blank" href="https://uri.amap.com/search?keyword=${encodeURIComponent(stop.address||stop.title)}">🗺️ 高德地圖</a>
+        ${stop.address?`<a class="addr" target="_blank" href="https://www.google.com/maps/search/${encodeURIComponent(stop.address)}">📍 ${stop.address}</a>`:''}
+        ${stop.phone && stop.phone!=='-'?`<a class="tel" href="tel:${stop.phone}">📞 ${stop.phone}</a>`:''}
+      </div>
+      <button class="del-stop">刪除此行程</button>
+    </div>
+  `;
+  const head = card.querySelector('.stop-head');
+  head.onclick=(e)=>{
+    if(document.body.classList.contains('editing') && e.target.closest('[contenteditable]')) return;
+    card.classList.toggle('open');
+  };
+  card.querySelector('.stop-title').addEventListener('blur', ()=>{ stop.title = card.querySelector('.stop-title').innerText; });
+  card.querySelector('[data-field="note"]').addEventListener('blur', ()=>{ stop.note = card.querySelector('[data-field="note"]').innerText; });
+  card.querySelector('.del-stop').onclick=(e)=>{
+    e.stopPropagation();
+    if(!confirm('確定要刪除這個行程嗎？')) return;
+    const i = day.stops.indexOf(stop);
+    if(i>-1) day.stops.splice(i,1);
+    wrap.remove();
+    updateSummary(day.id);
+  };
+  wrap.appendChild(card);
+  return wrap;
+}
+
+function updateSummary(dayId){
+  const day = tripData.days.find(d=>d.id===dayId);
+  if(!day) return;
+  const totalMin = day.stops.reduce((s,st)=>s+(Number(st.transport.min)||0),0);
+  const totalCost = day.stops.reduce((s,st)=>s+(Number(st.transport.cost)||0),0);
+  const box = document.querySelector(`.summary[data-summary="${dayId}"]`);
+  if(!box) return;
+  const h = Math.floor(totalMin/60), m = totalMin%60;
+  box.querySelector('[data-sum-time]').textContent = h>0? `${h} 時 ${m} 分` : `${m} 分`;
+  box.querySelector('[data-sum-cost]').textContent = `¥${totalCost}`;
+}
+
+function switchPanel(id){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.target===id));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active', p.id==='panel-'+id));
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+/* ---------------- Edit mode ---------------- */
+const fab = document.getElementById('fab');
+fab.onclick=()=>{
+  const on = document.body.classList.toggle('editing');
+  fab.classList.toggle('on', on);
+  fab.textContent = on? '✓' : '✎';
+  document.querySelectorAll('[data-field]').forEach(el=> el.setAttribute('contenteditable', on? 'true':'false'));
+};
+
+render();
+bindFlightInputs();
+</script>
+</body>
+</html>
