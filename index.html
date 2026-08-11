@@ -6,6 +6,7 @@
 <title>嗚啦啦廣州順德之旅</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
   :root{
     --ink:#1B1B1F;
@@ -248,6 +249,66 @@
   .add-item-row{display:flex; gap:8px; margin-top:8px;}
   .add-item-row input{flex:1; border:1.5px solid var(--line); border-radius:8px; padding:8px 10px; font-family:inherit; font-size:13px;}
   .add-item-row button{border:none; background:var(--jade); color:#fff; border-radius:8px; padding:0 14px; font-weight:700; font-family:inherit;}
+
+  /* Split / expense tracker */
+  .split-section{margin-bottom:20px;}
+  .split-section h3{font-size:15px; color:var(--red-deep); border-bottom:2px solid var(--red-deep); display:inline-block; padding-bottom:2px; margin-bottom:10px;}
+  .member-chips{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px;}
+  .member-chip{
+    display:flex; align-items:center; gap:6px; background:var(--paper2); border:1.5px solid var(--ink);
+    border-radius:20px; padding:6px 8px 6px 12px; font-size:13px; font-weight:700;
+  }
+  .member-chip button{
+    border:none; background:var(--red); color:#fff; width:18px; height:18px; border-radius:50%;
+    font-size:11px; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0;
+  }
+  .add-row{display:flex; gap:8px;}
+  .add-row input{flex:1; min-width:0; border:1.5px solid var(--line); border-radius:8px; padding:9px 10px; font-family:inherit; font-size:13px; box-sizing:border-box;}
+  .add-row button{border:none; background:var(--ink); color:#fff; border-radius:8px; padding:0 14px; font-weight:700; font-family:inherit; flex:0 0 auto;}
+
+  .expense-form{border:1.5px solid var(--ink); border-radius:var(--radius); padding:14px; background:#fff; box-shadow:var(--shadow); margin-bottom:16px;}
+  .expense-form .row{margin-bottom:10px;}
+  .expense-form label{font-size:10.5px; color:#8b8b90; font-weight:700; letter-spacing:.03em; display:block; margin-bottom:4px;}
+  .expense-form input[type=text], .expense-form input[type=number], .expense-form select{
+    width:100%; box-sizing:border-box; border:1.5px solid var(--line); border-radius:8px; padding:9px 10px;
+    font-family:inherit; font-size:13.5px; background:var(--paper); color:var(--ink);
+  }
+  .split-checks{display:flex; flex-wrap:wrap; gap:8px;}
+  .split-check{display:flex; align-items:center; gap:5px; background:var(--paper2); border:1px solid var(--line); border-radius:20px; padding:5px 10px; font-size:12.5px;}
+  .split-check input{width:15px; height:15px; accent-color:var(--jade);}
+  .split-quick{font-size:11px; color:var(--blue); text-decoration:underline; margin-left:auto; cursor:pointer; background:none; border:none; font-family:inherit;}
+  .expense-form .submit-btn{
+    width:100%; padding:12px; border:none; border-radius:10px; background:var(--red); color:#fff;
+    font-weight:700; font-size:14px; font-family:inherit; cursor:pointer; margin-top:4px;
+  }
+
+  .expense-item{border:1.5px solid var(--line); border-radius:var(--radius); padding:12px 14px; margin-bottom:8px; background:#fff; position:relative;}
+  .expense-item .top{display:flex; justify-content:space-between; align-items:flex-start; gap:8px;}
+  .expense-item .desc{font-weight:700; font-size:14px; padding-right:20px;}
+  .expense-item .amount{font-family:'Noto Serif TC',serif; font-weight:900; font-size:16px; color:var(--red-deep); flex:0 0 auto;}
+  .expense-item .meta{font-size:11.5px; color:#8b8b90; margin-top:5px; line-height:1.6;}
+  .expense-item .del-exp{
+    position:absolute; top:10px; right:10px; border:none; background:none; color:#b6b6ba; font-size:16px;
+    cursor:pointer; line-height:1; padding:2px 4px;
+  }
+  .empty-hint{font-size:12.5px; color:#9a9a9f; text-align:center; padding:14px 0;}
+
+  .summary-card{border:1.5px solid var(--ink); border-radius:var(--radius); background:var(--paper2); padding:14px; box-shadow:var(--shadow); margin-bottom:16px;}
+  .summary-card .total-row{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:10px; padding-bottom:10px; border-bottom:1px dashed var(--line);}
+  .summary-card .total-row .label{font-size:12.5px; color:#6b6b72;}
+  .summary-card .total-row .value{font-family:'Noto Serif TC',serif; font-weight:900; font-size:22px; color:var(--red-deep);}
+  .balance-row{display:flex; justify-content:space-between; align-items:center; padding:6px 0; font-size:13px;}
+  .balance-row .name{font-weight:700;}
+  .balance-row .amt.positive{color:var(--jade); font-weight:700;}
+  .balance-row .amt.negative{color:var(--red-deep); font-weight:700;}
+  .balance-row .amt.zero{color:#9a9a9f;}
+  .settle-item{
+    display:flex; align-items:center; gap:8px; background:#fff; border:1.5px solid var(--gold);
+    border-radius:10px; padding:10px 12px; margin-bottom:6px; font-size:13px;
+  }
+  .settle-item .ic{font-size:15px;}
+  .settle-item b{color:var(--red-deep);}
+  .settle-item b.to{color:var(--jade);}
 
   /* Edit FAB */
   .fab{
@@ -524,6 +585,7 @@ function render(){
   // 航班分頁（放最前面）
   const flightTab = document.createElement('div');
   flightTab.className='tab active';
+  flightTab.dataset.target='flight';
   flightTab.innerHTML=`<div class="num">✈️</div><div class="cn">航班</div>`;
   flightTab.onclick=()=>switchPanel('flight');
   tabbar.appendChild(flightTab);
@@ -574,6 +636,7 @@ function render(){
   // packing tab
   const packTab = document.createElement('div');
   packTab.className='tab pack';
+  packTab.dataset.target='packing';
   packTab.innerHTML=`<div class="num">🎒</div><div class="cn">行李</div>`;
   packTab.onclick=()=>switchPanel('packing');
   tabbar.appendChild(packTab);
@@ -600,6 +663,20 @@ function render(){
     packPanel.appendChild(catDiv);
   });
   panelsRoot.appendChild(packPanel);
+
+  // 分帳記帳分頁
+  const splitTab = document.createElement('div');
+  splitTab.className='tab pack';
+  splitTab.dataset.target='split';
+  splitTab.innerHTML=`<div class="num">💰</div><div class="cn">分帳</div>`;
+  splitTab.onclick=()=>switchPanel('split');
+  tabbar.appendChild(splitTab);
+
+  const splitPanel = document.createElement('div');
+  splitPanel.className='panel';
+  splitPanel.id='panel-split';
+  panelsRoot.appendChild(splitPanel);
+  refreshSplitPanel();
 
   document.querySelectorAll('.timeline').forEach(t=> updateSummary(t.dataset.day));
 
@@ -712,6 +789,244 @@ fab.onclick=()=>{
   fab.textContent = on? '✓' : '✎';
   document.querySelectorAll('[data-field]').forEach(el=> el.setAttribute('contenteditable', on? 'true':'false'));
 };
+
+/* ---------------- 分帳記帳 ---------------- */
+const splitData = {
+  members: ['我'],
+  expenses: [] // {id, desc, amount, paidBy, splitAmong:[...]}
+};
+let expenseIdSeq = 1;
+
+function fmtMoney(n){
+  const sign = n<0? '-' : '';
+  return sign + '¥' + Math.abs(Math.round(n));
+}
+
+function computeBalances(){
+  const balance = {};
+  splitData.members.forEach(m=> balance[m]=0);
+  splitData.expenses.forEach(exp=>{
+    const among = exp.splitAmong.filter(m=> splitData.members.includes(m));
+    if(among.length===0) return;
+    const share = exp.amount / among.length;
+    if(balance[exp.paidBy]!==undefined) balance[exp.paidBy] += exp.amount;
+    among.forEach(m=>{ balance[m] -= share; });
+  });
+  return balance;
+}
+
+function computeSettlements(balance){
+  const creditors=[], debtors=[];
+  Object.keys(balance).forEach(m=>{
+    const v = Math.round(balance[m]*100)/100;
+    if(v>0.5) creditors.push({m, v});
+    else if(v<-0.5) debtors.push({m, v:-v});
+  });
+  creditors.sort((a,b)=>b.v-a.v);
+  debtors.sort((a,b)=>b.v-a.v);
+  const settlements=[];
+  let i=0,j=0;
+  while(i<debtors.length && j<creditors.length){
+    const pay = Math.min(debtors[i].v, creditors[j].v);
+    settlements.push({from:debtors[i].m, to:creditors[j].m, amount:pay});
+    debtors[i].v -= pay; creditors[j].v -= pay;
+    if(debtors[i].v<0.5) i++;
+    if(creditors[j].v<0.5) j++;
+  }
+  return settlements;
+}
+
+function refreshSplitPanel(){
+  const panel = document.getElementById('panel-split');
+  if(!panel) return;
+
+  const memberChips = splitData.members.map(m=>
+    `<div class="member-chip">${m}<button data-remove-member="${m}">×</button></div>`
+  ).join('');
+
+  const payerOptions = splitData.members.map(m=>`<option value="${m}">${m}</option>`).join('');
+  const splitChecks = splitData.members.map(m=>
+    `<label class="split-check"><input type="checkbox" value="${m}" checked> ${m}</label>`
+  ).join('');
+
+  const totalAmount = splitData.expenses.reduce((s,e)=>s+e.amount,0);
+  const balance = computeBalances();
+  const settlements = computeSettlements(balance);
+
+  const expenseListHtml = splitData.expenses.length===0
+    ? `<div class="empty-hint">還沒有任何花費紀錄，新增一筆試試看吧</div>`
+    : splitData.expenses.slice().reverse().map(exp=>`
+        <div class="expense-item">
+          <button class="del-exp" data-del-exp="${exp.id}">✕</button>
+          <div class="top">
+            <div class="desc">${exp.desc}</div>
+            <div class="amount">${fmtMoney(exp.amount)}</div>
+          </div>
+          <div class="meta">由 <b>${exp.paidBy}</b> 支付　·　${exp.splitAmong.length} 人均分（每人 ${fmtMoney(exp.amount/(exp.splitAmong.length||1))}）<br>分攤：${exp.splitAmong.join('、')}</div>
+        </div>
+      `).join('');
+
+  const balanceRows = splitData.members.map(m=>{
+    const v = Math.round((balance[m]||0)*100)/100;
+    const cls = v>0.5? 'positive' : (v<-0.5? 'negative':'zero');
+    const label = v>0.5? '應收回' : (v<-0.5? '應付出':'已結清');
+    return `<div class="balance-row"><span class="name">${m}</span><span>${label}　<span class="amt ${cls}">${fmtMoney(Math.abs(v))}</span></span></div>`;
+  }).join('');
+
+  const settleHtml = settlements.length===0
+    ? `<div class="empty-hint">目前帳務已平衡，不需要互相轉帳 🎉</div>`
+    : settlements.map(s=>`
+        <div class="settle-item"><span class="ic">💸</span><b>${s.from}</b> 應付給 <b class="to">${s.to}</b>　<span style="margin-left:auto; font-weight:900;">${fmtMoney(s.amount)}</span></div>
+      `).join('');
+
+  panel.innerHTML = `
+    <div class="day-title"><div><h2>分帳記帳</h2><div class="day-note">記錄旅途花費，自動計算每人該收／該付多少</div></div></div>
+
+    <div class="split-section">
+      <h3>成員</h3>
+      <div class="member-chips">${memberChips}</div>
+      <div class="add-row">
+        <input type="text" id="newMemberInput" placeholder="輸入姓名，例如：小美">
+        <button id="addMemberBtn">加入成員</button>
+      </div>
+    </div>
+
+    <div class="split-section">
+      <h3>新增花費</h3>
+      <div class="expense-form">
+        <div class="row">
+          <label>項目名稱</label>
+          <input type="text" id="expDesc" placeholder="例如：晚餐 / 打車 / 門票">
+        </div>
+        <div class="row">
+          <label>金額（¥）</label>
+          <input type="number" id="expAmount" min="0" placeholder="0">
+        </div>
+        <div class="row">
+          <label>誰先付的錢</label>
+          <select id="expPaidBy">${payerOptions}</select>
+        </div>
+        <div class="row">
+          <label style="display:flex; align-items:center;">由誰分攤　<button type="button" class="split-quick" id="selectAllBtn">全選</button></label>
+          <div class="split-checks" id="splitChecksBox">${splitChecks}</div>
+        </div>
+        <button class="submit-btn" id="addExpenseBtn">＋ 加入這筆花費</button>
+      </div>
+    </div>
+
+    <div class="split-section">
+      <h3>花費紀錄</h3>
+      ${expenseListHtml}
+    </div>
+
+    <div class="split-section">
+      <h3>結算總覽</h3>
+      <div class="summary-card">
+        <div class="total-row"><span class="label">目前總花費</span><span class="value">${fmtMoney(totalAmount)}</span></div>
+        ${balanceRows}
+      </div>
+      <h3 style="margin-top:6px;">建議轉帳</h3>
+      ${settleHtml}
+      <button class="submit-btn" id="exportExcelBtn" style="margin-top:14px; background:var(--jade);">📤 匯出成 Excel</button>
+    </div>
+  `;
+
+  // 事件綁定
+  panel.querySelectorAll('[data-remove-member]').forEach(btn=>{
+    btn.onclick=()=>{
+      const name = btn.dataset.removeMember;
+      if(splitData.members.length<=1){ alert('至少要保留一位成員喔'); return; }
+      const involved = splitData.expenses.some(e=> e.paidBy===name || e.splitAmong.includes(name));
+      if(involved && !confirm(`「${name}」已有相關花費紀錄，移除成員將一併從紀錄中移除，確定嗎？`)) return;
+      splitData.members = splitData.members.filter(m=>m!==name);
+      splitData.expenses.forEach(e=>{ e.splitAmong = e.splitAmong.filter(m=>m!==name); });
+      splitData.expenses = splitData.expenses.filter(e=> e.paidBy!==name);
+      refreshSplitPanel();
+    };
+  });
+
+  panel.querySelector('#addMemberBtn').onclick=()=>{
+    const input = panel.querySelector('#newMemberInput');
+    const name = input.value.trim();
+    if(name==='') return;
+    if(splitData.members.includes(name)){ alert('這個名字已經存在囉'); return; }
+    splitData.members.push(name);
+    refreshSplitPanel();
+  };
+  panel.querySelector('#newMemberInput').addEventListener('keydown', (e)=>{
+    if(e.key==='Enter'){ e.preventDefault(); panel.querySelector('#addMemberBtn').click(); }
+  });
+
+  panel.querySelector('#selectAllBtn').onclick=()=>{
+    panel.querySelectorAll('#splitChecksBox input[type=checkbox]').forEach(cb=> cb.checked=true);
+  };
+
+  panel.querySelector('#addExpenseBtn').onclick=()=>{
+    const desc = panel.querySelector('#expDesc').value.trim();
+    const amount = Number(panel.querySelector('#expAmount').value);
+    const paidBy = panel.querySelector('#expPaidBy').value;
+    const among = Array.from(panel.querySelectorAll('#splitChecksBox input[type=checkbox]:checked')).map(cb=>cb.value);
+    if(desc===''){ alert('請輸入項目名稱'); return; }
+    if(!amount || amount<=0){ alert('請輸入正確的金額'); return; }
+    if(among.length===0){ alert('請至少選擇一位分攤的人'); return; }
+    splitData.expenses.push({id:expenseIdSeq++, desc, amount, paidBy, splitAmong:among});
+    refreshSplitPanel();
+  };
+
+  panel.querySelectorAll('[data-del-exp]').forEach(btn=>{
+    btn.onclick=()=>{
+      const id = Number(btn.dataset.delExp);
+      splitData.expenses = splitData.expenses.filter(e=>e.id!==id);
+      refreshSplitPanel();
+    };
+  });
+
+  panel.querySelector('#exportExcelBtn').onclick = exportSplitToExcel;
+}
+
+function exportSplitToExcel(){
+  if(typeof XLSX === 'undefined'){
+    alert('目前沒有網路連線，暫時無法匯出 Excel，請連上網路後再試一次。');
+    return;
+  }
+  if(splitData.expenses.length===0){
+    alert('目前還沒有花費紀錄，先新增幾筆花費再匯出喔！');
+    return;
+  }
+
+  const expenseRows = splitData.expenses.map(e=>({
+    '項目': e.desc,
+    '金額(¥)': e.amount,
+    '付款人': e.paidBy,
+    '分攤人數': e.splitAmong.length,
+    '分攤對象': e.splitAmong.join('、'),
+    '每人分攤(¥)': Math.round(e.amount / e.splitAmong.length)
+  }));
+  const totalRow = {'項目':'總計', '金額(¥)': splitData.expenses.reduce((s,e)=>s+e.amount,0), '付款人':'', '分攤人數':'', '分攤對象':'', '每人分攤(¥)':''};
+  expenseRows.push(totalRow);
+
+  const balance = computeBalances();
+  const balanceRows = splitData.members.map(m=>{
+    const v = Math.round((balance[m]||0)*100)/100;
+    return {
+      '成員': m,
+      '狀態': v>0.5? '應收回' : (v<-0.5? '應付出' : '已結清'),
+      '金額(¥)': Math.abs(v)
+    };
+  });
+
+  const settlements = computeSettlements(balance);
+  const settleRows = settlements.length>0
+    ? settlements.map(s=>({'付款人': s.from, '收款人': s.to, '金額(¥)': Math.round(s.amount)}))
+    : [{'付款人':'-', '收款人':'-', '金額(¥)':'目前帳務已平衡，不需轉帳'}];
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(expenseRows), '花費明細');
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(balanceRows), '結算總覽');
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(settleRows), '建議轉帳');
+
+  XLSX.writeFile(wb, '嗚啦啦廣州順德之旅_分帳紀錄.xlsx');
+}
 
 render();
 bindFlightInputs();
