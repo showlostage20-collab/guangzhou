@@ -285,14 +285,18 @@
   }
 
   .expense-item{border:1.5px solid var(--line); border-radius:var(--radius); padding:12px 14px; margin-bottom:8px; background:#fff; position:relative;}
+  .expense-item.editing{border-color:var(--gold); background:#FFFDF7;}
   .expense-item .top{display:flex; justify-content:space-between; align-items:flex-start; gap:8px;}
-  .expense-item .desc{font-weight:700; font-size:14px; padding-right:20px;}
+  .expense-item .desc{font-weight:700; font-size:14px; padding-right:44px;}
   .expense-item .amount{font-family:'Noto Serif TC',serif; font-weight:900; font-size:16px; color:var(--red-deep); flex:0 0 auto;}
   .expense-item .meta{font-size:11.5px; color:#8b8b90; margin-top:5px; line-height:1.6;}
-  .expense-item .del-exp{
-    position:absolute; top:10px; right:10px; border:none; background:none; color:#b6b6ba; font-size:16px;
-    cursor:pointer; line-height:1; padding:2px 4px;
+  .expense-item .item-actions{position:absolute; top:8px; right:8px; display:flex; gap:2px;}
+  .expense-item .item-actions button{
+    border:none; background:none; color:#b6b6ba; font-size:14px;
+    cursor:pointer; line-height:1; padding:4px 6px; border-radius:6px;
   }
+  .expense-item .item-actions .edit-exp:hover{background:rgba(216,155,46,0.15); color:#8a611b;}
+  .expense-item .item-actions .del-exp:hover{background:rgba(196,57,42,0.12); color:var(--red-deep);}
   .empty-hint{font-size:12.5px; color:#9a9a9f; text-align:center; padding:14px 0;}
 
   .summary-card{border:1.5px solid var(--ink); border-radius:var(--radius); background:var(--paper2); padding:14px; box-shadow:var(--shadow); margin-bottom:16px;}
@@ -877,6 +881,7 @@ const defaultSplitData = {
   expenses: [] // {id, desc, amount, date, category, paidBy, splitAmong:[...]}
 };
 let splitData = JSON.parse(JSON.stringify(defaultSplitData));
+let editingExpenseId = null;
 
 function newExpenseId(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
 
@@ -897,11 +902,22 @@ let suppressNextRemoteEcho = false;
 
 function initFirebaseSync(){
   try{
-    if(typeof firebase === 'undefined'){ console.warn('Firebase SDK 未載入，分帳資料僅會保存在本機瀏覽器'); return; }
+    if(typeof firebase === 'undefined'){
+      console.warn('Firebase SDK 未載入，分帳資料僅會保存在本機瀏覽器');
+      updateSyncBadge('offline');
+      return;
+    }
     const app = firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
     splitRef = db.ref('splitData');
+
+    // 若 5 秒內都沒有連線回應（例如網路被擋、file:// 開啟受限），顯示離線狀態
+    const connectTimeout = setTimeout(()=>{
+      if(!firebaseReady) updateSyncBadge('offline');
+    }, 5000);
+
     splitRef.on('value', (snap)=>{
+      clearTimeout(connectTimeout);
       const val = snap.val();
       if(val){
         splitData = val;
@@ -918,11 +934,13 @@ function initFirebaseSync(){
       updateSyncBadge('synced');
       refreshSplitPanel();
     }, (err)=>{
+      clearTimeout(connectTimeout);
       console.warn('Firebase 讀取失敗', err);
       updateSyncBadge('offline');
     });
   }catch(e){
     console.warn('Firebase 初始化失敗，分帳資料僅會保存在本機瀏覽器', e);
+    updateSyncBadge('offline');
   }
 }
 
@@ -1038,9 +1056,51 @@ function refreshSplitPanel(){
     <div class="balance-row"><span class="name">${c.emoji} ${c.label}</span><span>${fmtMoney(catTotals[c.key]||0)}</span></div>
   `).join('');
 
+  const categoryOptionsForEdit = (selected)=> expenseCategories.map(c=>`<option value="${c.key}" ${c.key===selected?'selected':''}>${c.emoji} ${c.label}</option>`).join('');
+  const payerOptionsForEdit = (selected)=> `<option value="${POOL_KEY}" ${selected===POOL_KEY?'selected':''}>💰 公帳（訂金支付）</option>` +
+    splitData.members.map(m=>`<option value="${m}" ${m===selected?'selected':''}>${m}（個人代墊）</option>`).join('');
+  const splitChecksForEdit = (selectedArr)=> splitData.members.map(m=>
+    `<label class="split-check"><input type="checkbox" value="${m}" ${selectedArr.includes(m)?'checked':''}> ${m}（${headOf(m)}人）</label>`
+  ).join('');
+
   const expenseListHtml = splitData.expenses.length===0
     ? `<div class="empty-hint">還沒有任何花費紀錄，新增一筆試試看吧</div>`
-    : splitData.expenses.slice().sort((a,b)=> (b.date||'').localeCompare(a.date||'') || b.id-a.id).map(exp=>{
+    : splitData.expenses.slice().sort((a,b)=> (b.date||'').localeCompare(a.date||'') || String(b.id).localeCompare(String(a.id))).map(exp=>{
+        if(editingExpenseId===exp.id){
+          return `
+          <div class="expense-item editing">
+            <div class="expense-form" style="box-shadow:none; padding:0; border:none;">
+              <div class="row">
+                <label>類別</label>
+                <select data-edit-field="category" data-edit-id="${exp.id}">${categoryOptionsForEdit(exp.category)}</select>
+              </div>
+              <div class="row">
+                <label>日期</label>
+                <input type="date" data-edit-field="date" data-edit-id="${exp.id}" value="${exp.date||''}">
+              </div>
+              <div class="row">
+                <label>項目名稱</label>
+                <input type="text" data-edit-field="desc" data-edit-id="${exp.id}" value="${exp.desc}">
+              </div>
+              <div class="row">
+                <label>金額（¥）</label>
+                <input type="number" min="0" data-edit-field="amount" data-edit-id="${exp.id}" value="${exp.amount}">
+              </div>
+              <div class="row">
+                <label>錢是誰付的</label>
+                <select data-edit-field="paidBy" data-edit-id="${exp.id}">${payerOptionsForEdit(exp.paidBy)}</select>
+              </div>
+              <div class="row">
+                <label>由誰分攤</label>
+                <div class="split-checks" data-edit-splitbox="${exp.id}">${splitChecksForEdit(exp.splitAmong)}</div>
+              </div>
+              <div style="display:flex; gap:8px; margin-top:6px;">
+                <button class="submit-btn" style="background:var(--jade); flex:1;" data-save-edit="${exp.id}">✓ 儲存</button>
+                <button class="submit-btn" style="background:#9a9a9f; flex:1;" data-cancel-edit="${exp.id}">取消</button>
+              </div>
+            </div>
+          </div>`;
+        }
         const c = catInfo(exp.category);
         const payerLabel = exp.paidBy===POOL_KEY ? '💰 公帳' : exp.paidBy;
         const dateLabel = exp.date ? exp.date.slice(5).replace('-','/') + '　' : '';
@@ -1048,7 +1108,10 @@ function refreshSplitPanel(){
         const shareText = exp.splitAmong.map(m=> `${m} ${fmtMoney(shares[m]||0)}`).join('、');
         return `
         <div class="expense-item">
-          <button class="del-exp" data-del-exp="${exp.id}">✕</button>
+          <div class="item-actions">
+            <button class="edit-exp" data-edit-exp="${exp.id}">✎</button>
+            <button class="del-exp" data-del-exp="${exp.id}">✕</button>
+          </div>
           <div class="top">
             <div class="desc"><span class="cat-tag">${c.emoji} ${c.label}</span>${exp.desc}</div>
             <div class="amount">${fmtMoney(exp.amount)}</div>
@@ -1220,7 +1283,46 @@ function refreshSplitPanel(){
   panel.querySelectorAll('[data-del-exp]').forEach(btn=>{
     btn.onclick=()=>{
       const id = btn.dataset.delExp;
+      if(!confirm('確定要刪除這筆花費嗎？')) return;
       splitData.expenses = splitData.expenses.filter(e=>String(e.id)!==String(id));
+      if(editingExpenseId===id) editingExpenseId=null;
+      pushSplitData();
+      refreshSplitPanel();
+    };
+  });
+
+  panel.querySelectorAll('[data-edit-exp]').forEach(btn=>{
+    btn.onclick=()=>{
+      editingExpenseId = btn.dataset.editExp;
+      refreshSplitPanel();
+    };
+  });
+
+  panel.querySelectorAll('[data-cancel-edit]').forEach(btn=>{
+    btn.onclick=()=>{
+      editingExpenseId = null;
+      refreshSplitPanel();
+    };
+  });
+
+  panel.querySelectorAll('[data-save-edit]').forEach(btn=>{
+    btn.onclick=()=>{
+      const id = btn.dataset.saveEdit;
+      const exp = splitData.expenses.find(e=> String(e.id)===String(id));
+      if(!exp) return;
+      const wrap = btn.closest('.expense-item');
+      const category = wrap.querySelector('[data-edit-field="category"]').value;
+      const date = wrap.querySelector('[data-edit-field="date"]').value;
+      const desc = wrap.querySelector('[data-edit-field="desc"]').value.trim();
+      const amount = Number(wrap.querySelector('[data-edit-field="amount"]').value);
+      const paidBy = wrap.querySelector('[data-edit-field="paidBy"]').value;
+      const among = Array.from(wrap.querySelectorAll('[data-edit-splitbox] input[type=checkbox]:checked')).map(cb=>cb.value);
+      if(desc===''){ alert('請輸入項目名稱'); return; }
+      if(!amount || amount<=0){ alert('請輸入正確的金額'); return; }
+      if(among.length===0){ alert('請至少選擇一位分攤的人'); return; }
+      exp.category = category; exp.date = date; exp.desc = desc; exp.amount = amount;
+      exp.paidBy = paidBy; exp.splitAmong = among;
+      editingExpenseId = null;
       pushSplitData();
       refreshSplitPanel();
     };
