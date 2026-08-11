@@ -309,6 +309,20 @@
   .settle-item .ic{font-size:15px;}
   .settle-item b{color:var(--red-deep);}
   .settle-item b.to{color:var(--jade);}
+  .deposit-row{display:flex; align-items:center; justify-content:space-between; padding:6px 0; gap:10px;}
+  .deposit-row .name{font-weight:700; font-size:13.5px; display:flex; align-items:center; gap:4px;}
+  .head-badge{font-size:10.5px; font-weight:700; color:var(--jade); background:rgba(31,122,92,0.1); border-radius:20px; padding:2px 7px;}
+  .deposit-inputs{display:flex; align-items:center; gap:6px;}
+  .deposit-inputs input{
+    box-sizing:border-box; border:1.5px solid var(--line); border-radius:8px; padding:7px 8px;
+    font-family:inherit; font-size:13px; text-align:right; background:#fff;
+  }
+  .deposit-inputs .head-input{width:52px;}
+  .deposit-inputs .deposit-input{width:90px;}
+  .cat-tag{
+    display:inline-block; font-size:10.5px; font-weight:700; background:var(--paper2); color:var(--ink);
+    border-radius:20px; padding:2px 8px; margin-right:6px; border:1px solid var(--line);
+  }
 
   /* Edit FAB */
   .fab{
@@ -330,9 +344,9 @@
 <body>
 
 <div class="hero">
-  <div class="eyebrow">4 DAYS · 广州 · 佛山 · 顺德</div>
+  <div class="eyebrow">5 DAYS · 广州 · 佛山 · 顺德</div>
   <h1>嗚啦啦<span>廣州順德</span>之旅</h1>
-  <p class="sub">2026.09.24 – 09.28　老城騎樓 × 批發淘貨 × 廣州塔夜景 × 順德味道 — 全程以打車／地鐵移動</p>
+  <p class="sub">2026.09.24 – 09.28　老城騎樓 × 批發淘貨 × 佛山順德 × 小蠻腰快閃 — 全程以打車／地鐵移動</p>
   <div class="base-card">
     <span>🏨</span>
     <div><b>住宿基地：</b>北京路步行街／吾悅廣場民宿，4晚皆以此為出發與回程點。</div>
@@ -353,88 +367,68 @@
 const tripData = {
   days: [
     {
-      id:'d1', num:'壹', label:'DAY 1', date:'09/25', title:'廣州老城　北京路夜市',
-      note:'越秀公園．陳家祠．永慶坊．上下九．北京路',
+      id:'d0', num:'壹', label:'DAY 1', date:'09/24', title:'抵達廣州　入境轉移',
+      note:'台中出發．桃園機場．南沙港入境．前往民宿．北京路夜市',
+      stops:[
+        {time:'05:15', type:'spot', title:'台中出發', tag:'交通',
+          transport:{mode:'walk', from:'', min:0, cost:0},
+          note:'自駕從台中前往桃園國際機場，全程約140公里，走國道1號或國道3號銜接國道2號，順路約需2小時，這裡抓2小時15分含緩衝。天還沒亮，記得留意精神狀況，必要時中途休息站稍作休息。'},
+        {time:'07:30', type:'spot', title:'抵達桃園機場', tag:'交通',
+          transport:{mode:'drive', from:'台中', min:135, cost:0},
+          note:'班機 10:50 起飛，航空公司建議至少提前 3 小時抵達機場辦理登機手續，7:30 到場含停車、拖運行李、通關安檢時間算是比較保險。停車場費用約每日最高 490 元（機場內），或選機場周邊民營停車場較划算；此段自駕油資／過路費約落在新台幣600–800元，屬台幣支出，未列入下方廣州行程的人民幣花費總計中。'},
+        {time:'15:30', type:'spot', title:'抵達南沙港客運碼頭', tag:'入境',
+          transport:{mode:'walk', from:'', min:0, cost:0},
+          note:'香港－廣州航段（國泰航空 CX9845／珠江客運 3A 代碼共享）抵達南沙港客運碼頭，準備辦理入境登記手續。'},
+        {time:'15:40', type:'spot', title:'入境登記／通關', tag:'入境',
+          transport:{mode:'walk', from:'', min:0, cost:0},
+          note:'辦理入境登記、行李提領與通關手續，預留約 40–60 分鐘較保險，尖峰時段可能更久。'},
+        {time:'16:30', type:'spot', title:'前往民宿', tag:'交通',
+          transport:{mode:'taxi', from:'南沙港客運碼頭', min:75, cost:150},
+          note:'南沙距離市區較遠，打車前往北京路約需 60–90 分鐘（依路況浮動），建議上車前先確認車資，可考慮多人共乘分攤車費。'},
+        {time:'18:00', type:'spot', title:'民宿check-in', tag:'住宿',
+          transport:{mode:'walk', from:'', min:0, cost:0},
+          note:'北京路步行街／吾悅廣場民宿，辦理入住、放下行李稍作休息，準備吃晚餐。'},
+        {time:'19:00', type:'spot', title:'北京路夜市晚餐', tag:'夜市／步行街',
+          transport:{mode:'walk', from:'民宿', min:5, cost:0},
+          note:'必看「北京路千年古道」玻璃地面遺跡；晚上沿路是廣州最熱鬧的步行街之一，可順道逛吾悅廣場。必吃：阿姨牛雜（1988年老店，蘿蔔牛雜湯汁濃郁）、步步高昇缽仔糕（純手工製作，人氣款需提前一天預訂）；北京路的府學西街塗鴉牆、大佛古寺夜景也適合順路拍照。剛落地舟車勞頓，這晚建議早點休息，養足精神迎接接下來三天的行程。'},
+        {time:'21:00', type:'spot', title:'返回民宿', tag:'回程',
+          transport:{mode:'walk', from:'北京路夜市', min:5, cost:0},
+          note:'北京路夜市步行即可回到吾悅廣場民宿，結束抵達日行程。'}
+      ]
+    },
+    {
+      id:'d1', num:'貳', label:'DAY 2', date:'09/25', title:'廣州老城　西關風情',
+      note:'越秀公園．陳家祠．永慶坊．上下九',
       stops:[
         {time:'09:00', type:'spot', title:'越秀公園', tag:'景點',
           transport:{mode:'taxi', from:'民宿', min:12, cost:15},
           note:'廣州地標公園，園內「五羊石像」是廣州「羊城」別稱由來，也是老廣州人假日散步的地方，可順道望見中山紀念碑。'},
         {time:'11:00', type:'spot', title:'陳家祠', tag:'景點',
           transport:{mode:'metro', from:'越秀公園', min:20, cost:4},
-          note:'原為清代廣東各地陳氏宗族合資興建的書院「陳氏書院」，以木雕、石雕、磚雕、灰塑、陶塑「五雕」聞名，是嶺南建築藝術的代表作，非常適合拍照。'},
+          note:'原為清代廣東各地陳氏宗族合資興建的書院「陳氏書院」，以木雕、石雕、磚雕、灰塑、陶塑「五雕」聞名，是嶺南建築藝術的代表作。必看重點：正門兩側6幅大型磚雕《梁山聚義》《梧桐杏柳鳳凰群》，工藝細膩層次分明；後座11座雙層透雕神龕；還有16扇雙面鏤空木雕屏門，被譽為「用木頭雕就的歷史故事長廊」，非常適合拍照。'},
         {time:'12:30', type:'food', title:'午餐：點都德 / 陶陶居', tag:'必吃',
           transport:{mode:'taxi', from:'陳家祠', min:10, cost:15},
-          note:'兩間都是廣州代表性早茶品牌。必點：蝦餃皇、紅米腸、叉燒包、蒸排骨、鳳爪、流沙包、腸粉。',
+          note:'兩間都是廣州代表性早茶品牌。必點：招牌蝦餃皇、金莎海蝦紅米腸、蜜汁叉燒包、鮮蝦流沙包、特色蒸排骨、鳳爪；陶陶居創於1880年，是廣州最古老酒樓之一，招牌凍爪、虎皮鳳爪、榴槤酥也常被推薦。小提醒：這兩家對遊客很方便，但部分本地老饕會覺得偏「預製、不夠新鮮」，若想吃更道地的早茶可以留意附近蓮香樓等老字號。',
           address:'點都德：廣州市越秀區北京路352號　／　陶陶居：廣州市越秀區北京路168號附近',
           phone:'+862083522927'},
         {time:'14:00', type:'spot', title:'永慶坊', tag:'景點',
           transport:{mode:'taxi', from:'北京路', min:15, cost:18},
-          note:'荔灣區老西關改造街區，保留西關老屋、騎樓建築，李小龍祖居也在此，現在進駐許多文創小店與咖啡館，是廣州最好拍照的地方之一。'},
+          note:'荔灣區老西關改造街區，保留西關老屋、騎樓建築，李小龍祖居也在此，現在進駐許多文創小店與咖啡館，是廣州最好拍照的地方之一。必打卡：月亮橋（晚上7點後亮燈，水面倒影很美）、粵劇藝術博物館（免費入場，園林式建築，每天約11:00/15:00/19:30有免費粵劇折子戲）、黑金配色的「鐘書閣」網紅書店、活字印刷體驗館。美食可留意凌記（豬手撈粗面）、信牛奶甜品專家（椰汁馬蹄爽、雙皮奶）等在地熱門小店。'},
         {time:'16:00', type:'spot', title:'上下九步行街', tag:'景點',
           transport:{mode:'taxi', from:'永慶坊', min:10, cost:12},
-          note:'老廣州代表性商業步行街，可逛荔灣廣場、西關大屋與各式老字號，是「老廣州＋小吃＋平價購物」的縮影。'},
+          note:'老廣州代表性商業步行街，可逛荔灣廣場、西關大屋與各式老字號，是「老廣州＋小吃＋平價購物」的縮影。必吃老字號：銀記腸粉（創於1935年，牛肉腸粉是招牌）、寶華麵店（鮮蝦雲吞麵，蝦仁彈牙）、陳添記（爽魚皮、艇仔粥）；也可買泮塘馬蹄糕、臘味手信帶回家。'},
         {time:'17:30', type:'food', title:'晚餐：陳添記 / 銀記腸粉店', tag:'必吃',
           transport:{mode:'walk', from:'上下九', min:5, cost:0},
-          note:'陳添記以魚皮、豬腳薑、艇仔粥聞名；銀記腸粉店則是廣州腸粉老字號，兩者都可步行到達。',
+          note:'陳添記祖傳爽魚皮處理極淨，口感爽脆彈牙，拌花生、薑絲與秘製醬油，配一碗料多豐富的艇仔粥就是最正宗西關風味；銀記腸粉店則是廣州腸粉老字號，招牌牛肉腸粉粉皮薄如蟬翼，值得一試。',
           address:'陳添記：廣州市荔灣區　／　銀記腸粉店：廣州市越秀區北京路惠福東路519號',
           phone:'+862083177149'},
-        {time:'19:00', type:'spot', title:'北京路夜市', tag:'夜市／步行街',
+        {time:'19:00', type:'spot', title:'返回民宿', tag:'回程',
           transport:{mode:'taxi', from:'晚餐地點', min:15, cost:18},
-          note:'必看「北京路千年古道」玻璃地面遺跡；晚上沿路是廣州最熱鬧的步行街之一，可順道逛吾悅廣場，直接走回民宿。'}
+          note:'昨晚已經逛過北京路夜市，今天用完晚餐可以直接回民宿休息，養精蓄銳準備明天的佛山順德一日遊。'}
       ]
     },
     {
-      id:'d2', num:'貳', label:'DAY 2', date:'09/26', title:'批發購物日',
-      note:'白馬服裝市場．十三行．一德路．三元里皮具',
-      stops:[
-        {time:'09:00', type:'shop', title:'白馬服裝市場', tag:'批發市場',
-          transport:{mode:'taxi', from:'民宿', min:15, cost:20},
-          note:'廣州最具代表性的服裝批發市場之一，營業約 08:00–18:00。適合買女裝、男裝、外套、褲子、毛衣、包包、鞋子，建議越早去越好逛。',
-          address:'廣州市越秀區站南路16號', phone:'-'},
-        {time:'11:30', type:'shop', title:'十三行批發城', tag:'批發市場',
-          transport:{mode:'taxi', from:'白馬市場', min:12, cost:16},
-          note:'偏向年輕女裝、快時尚、平價款式，是廣州快時尚服飾批發的重要集散地。',
-          address:'廣州市荔灣區長堤路購物休閒街興隆北路11號', phone:'-'},
-        {time:'13:30', type:'shop', title:'一德路', tag:'批發街',
-          transport:{mode:'walk', from:'十三行', min:8, cost:0},
-          note:'可逛玩具、禮品、飾品、小商品、食品與節慶用品，很有「批發淘寶街」的氛圍，適合買伴手禮小物。'},
-        {time:'15:00', type:'shop', title:'三元里／白雲皮具市場', tag:'批發市場',
-          transport:{mode:'taxi', from:'一德路', min:20, cost:25},
-          note:'廣州最重要的皮具、包袋、皮帶採購區，例如廣州白雲世界皮具貿易中心。建議挑選標示「無 Logo」「原創款」「同款風格」「頭層牛皮」「工廠貨」的商品，品質實在又不涉及仿冒糾紛。',
-          address:'廣州市白雲區（白雲世界皮具貿易中心）', phone:'+862087674536'},
-        {time:'18:00', type:'spot', title:'返回北京路', tag:'回程',
-          transport:{mode:'taxi', from:'三元里', min:25, cost:30},
-          note:'回民宿稍作休息，把戰利品放下，準備吃晚餐。'},
-        {time:'19:30', type:'spot', title:'北京路晚餐＋購物', tag:'夜市／步行街',
-          transport:{mode:'walk', from:'民宿', min:5, cost:0},
-          note:'路線建議：北京路 → 惠福東路 → 北京路夜市 → 吾悅廣場。晚餐可吃牛雜、雲吞麵、炒河粉、煲仔飯、糖水、雙皮奶。'}
-      ]
-    },
-    {
-      id:'d3', num:'叁', label:'DAY 3', date:'09/27', title:'廣州塔　珠江夜景',
-      note:'沙面島．廣州塔．珠江夜遊．天河商圈',
-      stops:[
-        {time:'09:30', type:'spot', title:'沙面島', tag:'景點',
-          transport:{mode:'taxi', from:'民宿', min:15, cost:18},
-          note:'珠江中的小島，保留大量歐式建築與林蔭大道，是廣州拍照最漂亮的地方之一，適合慢慢散步約 1.5–2 小時。'},
-        {time:'11:30', type:'food', title:'西關午餐', tag:'必吃',
-          transport:{mode:'taxi', from:'沙面島', min:8, cost:12},
-          note:'推薦白切雞、燒鵝、叉燒、乳鴿、雲吞麵，西關一帶老字號選擇多。'},
-        {time:'15:30', type:'spot', title:'廣州塔', tag:'必去地標',
-          transport:{mode:'taxi', from:'西關', min:20, cost:28},
-          note:'俗稱「小蠻腰」，廣州新地標。建議 16:00 左右到，先看白天視野再等天黑。不上塔的話，塔下與珠江邊拍照、看夜景也很值得。',
-          address:'廣州市海珠區閱江西路', phone:'+862089338222'},
-        {time:'18:30', type:'spot', title:'珠江夜景／珠江夜遊', tag:'必去',
-          transport:{mode:'walk', from:'廣州塔', min:5, cost:0},
-          note:'預算允許可搭珠江夜遊船，從江面欣賞兩岸燈光與廣州塔全景，是廣州晚上最推薦的行程之一。'},
-        {time:'20:30', type:'shop', title:'天河商圈：太古匯', tag:'高級商場',
-          transport:{mode:'taxi', from:'珠江邊', min:15, cost:20},
-          note:'太古匯定位精品、國際品牌與高級餐廳，適合拍照逛街；也可續逛天環廣場、正佳廣場、天河城，選擇集中好逛。',
-          address:'廣州市天河區天河路383號', phone:'-'}
-      ]
-    },
-    {
-      id:'d4', num:'肆', label:'DAY 4', date:'09/28', title:'佛山順德　美食日',
+      id:'d2', num:'叁', label:'DAY 3', date:'09/26', title:'佛山順德　美食日',
       note:'佛山祖廟．嶺南天地．清暉園．華蓋路．漁人碼頭',
       stops:[
         {time:'08:00', type:'spot', title:'出發前往佛山', tag:'交通',
@@ -442,35 +436,99 @@ const tripData = {
           note:'建議 2–4 人可直接打車前往佛山，比轉乘城際更省時間。'},
         {time:'09:00', type:'spot', title:'佛山祖廟', tag:'景點',
           transport:{mode:'walk', from:'', min:0, cost:0},
-          note:'佛山代表性景點，可看黃飛鴻、葉問武術文化與嶺南建築工藝，是佛山歷史文化的縮影，安排約 1.5 小時。',
+          note:'佛山代表性景點，可看黃飛鴻、葉問武術文化與嶺南建築工藝，是佛山歷史文化的縮影。必看：萬福台（華南最完整的古戲台，建於清順治年間）、靈應牌坊（明代木石牌坊，兼具避雷功能，拍照必打卡）、正殿陶塑瓦脊「花脊之王」；黃飛鴻紀念館與葉問堂內有醒獅表演，時間約每天 10:00–10:40、14:15–14:55、15:30–16:10，建議提早到場佔位。安排約 1.5–2 小時。',
           address:'佛山市禪城區桂城', phone:'-'},
         {time:'10:30', type:'spot', title:'嶺南天地', tag:'景點',
           transport:{mode:'walk', from:'祖廟', min:5, cost:0},
-          note:'比純觀光景區更有生活感的老街區，結合老街、餐廳、咖啡與文創小店，很適合拍照散步。'},
+          note:'比純觀光景區更有生活感的老街區，結合老街、餐廳、咖啡與文創小店，很適合拍照散步。非遺體驗區可看竹編、佛山剪紙、彩燈製作等傳統工藝現場展示，傍晚時分燈光氛圍特別好拍。'},
         {time:'12:00', type:'spot', title:'前往順德大良', tag:'交通',
           transport:{mode:'taxi', from:'嶺南天地', min:35, cost:65},
           note:'依路況約 30–40 分鐘車程。'},
         {time:'13:00', type:'spot', title:'清暉園', tag:'景點',
           transport:{mode:'walk', from:'', min:0, cost:0},
-          note:'順德代表性嶺南園林，建築與造景精緻，建議停留 1 小時左右，把時間留給後面吃東西。',
+          note:'順德代表性嶺南園林，與梁園、余蔭山房、可園並稱「嶺南四大名園」，建築與造景精緻，池塘養有錦鯉，古色古香很適合拍照。門票約15元（學生半價），建議停留 1 小時左右，把時間留給後面吃東西。',
           address:'佛山市順德區清暉路23號', phone:'+8675722226196'},
         {time:'14:15', type:'spot', title:'華蓋路步行街', tag:'步行街',
           transport:{mode:'walk', from:'清暉園', min:8, cost:0},
-          note:'順德的美食＋老街＋小吃＋購物集中地，順德甜品與正餐都在附近解決。'},
+          note:'順德的美食＋老街＋小吃＋購物集中地，順德甜品與正餐都在附近解決。必吃：韋記牛雜湯（牛雜四件套：牛雜、蘿蔔、麵筋、豆泡）、阿三麻蓉湯圓（紅豆雙皮奶配糯叽叽湯圓）；街尾的華蓋山棧道可以俯瞰整條街的熱鬧景象，也是熱門拍照點。'},
         {time:'14:30', type:'food', title:'順德甜品：仁信老舖 / 民信老舖', tag:'必吃',
           transport:{mode:'walk', from:'華蓋路', min:3, cost:0},
-          note:'順德最經典的雙皮奶、薑撞奶、炸牛奶、倫教糕都在這裡，仁信老舖是大良經典甜品站。',
+          note:'順德最經典的雙皮奶、薑撞奶、炸牛奶、倫教糕都在這裡，仁信老舖是大良經典甜品站。民信老舖的「原隻椰子燉奶」是招牌創新甜品（在雙皮奶工藝基礎上加入椰皇與水牛奶），3樓還有雙皮奶博物館可以了解製作歷史；金榜街一帶的水牛奶（欢记牛乳、梯底牛乳鋪）也是在地人氣飲品，比一般牛奶濃郁香滑。',
           address:'仁信老舖：佛山市順德區東苑路　／　民信老舖：佛山市順德區東樂路', phone:'-'},
         {time:'16:00', type:'food', title:'順德正餐', tag:'必吃',
           transport:{mode:'walk', from:'甜品店', min:5, cost:0},
-          note:'必試順德魚（或蒸魚）、燒鵝、順德粥、炒牛奶；順德料理的重點就是「鮮」。'},
+          note:'必試順德魚生（一魚多吃，野仙魚生開在三百年古宅裡，也可試試「捞德順」）、桑拿雞（蒸煮時間短、肉質Q彈，沾醬油沙薑）、順德燒鵝、太艮堡毋米粥（粥水黏稠卻不見一粒米），順德料理的重點就是「鮮」，敢吃生食的話魚生絕對是必體驗招牌菜。'},
         {time:'18:00', type:'spot', title:'順德漁人碼頭', tag:'夜景／步行街',
           transport:{mode:'taxi', from:'順德市區', min:10, cost:15},
-          note:'適合拍照、看夜景、吃小吃、喝咖啡，是順德晚上最放鬆的收尾行程。',
+          note:'適合拍照、看夜景、吃小吃、喝咖啡，是順德晚上最放鬆的收尾行程。碼頭上有不少明星塗鴉牆與標誌性燈塔可以拍照，小吃攤常見西瓜汁等飲品（約6–8元），傍晚6–7點左右看夕陽是最推薦的時段。',
           address:'佛山市順德區東堤路7號', phone:'-'},
-        {time:'20:00', type:'spot', title:'返回廣州北京路', tag:'交通',
+        {time:'20:00', type:'spot', title:'返回民宿', tag:'回程',
           transport:{mode:'taxi', from:'漁人碼頭', min:50, cost:110},
-          note:'車程約 50 分鐘視路況，回民宿休息，結束 4 天行程。'}
+          note:'車程約 50 分鐘視路況，回民宿休息。'}
+      ]
+    },
+    {
+      id:'d3', num:'肆', label:'DAY 4', date:'09/27', title:'批發購物日',
+      note:'白馬服裝市場．十三行．一德路．三元里皮具',
+      stops:[
+        {time:'09:00', type:'shop', title:'白馬服裝市場', tag:'批發市場',
+          transport:{mode:'taxi', from:'民宿', min:15, cost:20},
+          note:'廣州最具代表性的服裝批發市場之一，交易量最大、走中高端路線，營業約 08:00–18:00。樓層攻略：1樓是精品高端女裝，4、5樓款式與質量最好但價位也最高，6樓主要批發男裝；主打大衣、羽絨服、洋裝、針織衫。建議越早去越好逛，議價空間也較大。',
+          address:'廣州市越秀區站南路16號', phone:'-'},
+        {time:'11:30', type:'shop', title:'十三行批發城', tag:'批發市場',
+          transport:{mode:'taxi', from:'白馬市場', min:12, cost:16},
+          note:'偏向年輕女裝、快時尚、平價款式，是廣州快時尚服飾批發的重要集散地，核心是「新中國大廈」。樓層攻略：2–3樓是核心潮流區，主打原創韓風，中大型批發檔口集中；1樓多是東南亞風與小飾品；營業時間偏早（約7:00–13:00），建議上午前往，通常可談3～5件混批。',
+          address:'廣州市荔灣區長堤路購物休閒街興隆北路11號', phone:'-'},
+        {time:'13:30', type:'shop', title:'一德路', tag:'批發街',
+          transport:{mode:'walk', from:'十三行', min:8, cost:0},
+          note:'可逛玩具、禮品、飾品、小商品、食品與節慶用品，很有「批發淘寶街」的氛圍，適合買伴手禮小物。這裡是東南亞地區最大的海味乾果批發市場，必買花菇、蟲草花、瑤柱等乾貨，知名店家集中在「山海城」「海中寶」；玩具則以萬菱廣場、一德國際玩具精品廣場、中港玩具精品批發市場最集中。附近的石室聖心大教堂（哥德式紅磚教堂）也很適合順路拍照。'},
+        {time:'15:00', type:'shop', title:'三元里／白雲皮具市場', tag:'批發市場',
+          transport:{mode:'taxi', from:'一德路', min:20, cost:25},
+          note:'廣州最重要的皮具、包袋、皮帶採購區，例如廣州白雲世界皮具貿易中心（分一期、二期），是中高檔真皮女包、輕奢款式的集散地。逛法建議：精華檔口多在1–2樓，尤其近大門的區域；建議挑選標示「無 Logo」「原創款」「同款風格」「頭層牛皮」「工廠貨」的商品，品質實在又不涉及仿冒糾紛，銷售假冒註冊商標的商品在中國大陸屬違法行為，務必避免購買。',
+          address:'廣州市白雲區（白雲世界皮具貿易中心）', phone:'+862087674536'},
+        {time:'18:00', type:'spot', title:'返回民宿', tag:'回程',
+          transport:{mode:'taxi', from:'三元里', min:25, cost:30},
+          note:'先回民宿稍作休息，把戰利品放下，準備吃晚餐。'},
+        {time:'19:30', type:'spot', title:'北京路晚餐＋購物', tag:'夜市／步行街',
+          transport:{mode:'walk', from:'民宿', min:5, cost:0},
+          note:'路線建議：北京路 → 惠福東路 → 北京路夜市 → 吾悅廣場。晚餐可吃牛雜、雲吞麵、炒河粉、煲仔飯、糖水、雙皮奶。'},
+        {time:'21:00', type:'spot', title:'返回民宿', tag:'回程',
+          transport:{mode:'walk', from:'北京路', min:5, cost:0},
+          note:'逛街購物後步行回吾悅廣場民宿休息，明天是最後一天，記得把行李收好。'}
+      ]
+    },
+    {
+      id:'d4', num:'伍', label:'DAY 5', date:'09/28', title:'廣州塔快閃　返程',
+      note:'退房．廣州塔．前往南沙港．搭船返港轉機',
+      stops:[
+        {time:'08:30', type:'spot', title:'民宿退房', tag:'交通',
+          transport:{mode:'walk', from:'', min:0, cost:0},
+          note:'回程船班 15:50 從南沙港客運碼頭開航，建議提前2小時（13:50前）抵達碼頭辦理登船／出境手續，今天時間比較緊湊，行李請提前收拾好。'},
+        {time:'09:00', type:'spot', title:'前往廣州塔', tag:'交通',
+          transport:{mode:'taxi', from:'民宿', min:20, cost:25},
+          note:'廣州塔位於海珠區，方向上比市區更靠近南沙，安排在回程路上順遊，比昨天才特地跑一趟更省時間。'},
+        {time:'09:30', type:'spot', title:'廣州塔（快閃參觀）', tag:'必去地標',
+          transport:{mode:'walk', from:'', min:0, cost:0},
+          note:'俗稱「小蠻腰」，廣州新地標，塔身主體450米。今天時間有限，建議直接登塔看白天景觀即可（488米戶外觀景平台，360度俯瞰全城），摩天輪夜景與太古匯商場這次時間不夠，只能割愛留待下次造訪。安排 1–1.5 小時，注意保留足夠時間前往南沙港。',
+          address:'廣州市海珠區閱江西路', phone:'+862089338222'},
+        {time:'11:00', type:'spot', title:'前往南沙港客運碼頭', tag:'交通',
+          transport:{mode:'taxi', from:'廣州塔', min:65, cost:130},
+          note:'車程依路況約 60–70 分鐘，這是預估值，建議出發前用地圖 App 查詢即時路況，務必抓寬裕一點，確保能在 13:50 前抵達碼頭。'},
+        {time:'12:30', type:'spot', title:'抵達南沙港，辦理登船手續', tag:'交通',
+          transport:{mode:'walk', from:'', min:0, cost:0},
+          note:'預留約1.5–2小時辦理登船、出境安檢等手續，13:50前完成即符合建議的2小時緩衝。'},
+        {time:'15:50', type:'spot', title:'南沙港開航前往香港', tag:'交通',
+          transport:{mode:'walk', from:'', min:0, cost:0},
+          note:'國泰航空 CX9846／珠江客運 3A（代碼共享），從南沙港客運碼頭開航前往香港國際機場T1，航程約1小時10分鐘。'},
+        {time:'17:00', type:'spot', title:'抵達香港國際機場', tag:'轉機',
+          transport:{mode:'walk', from:'', min:0, cost:0},
+          note:'抵達香港國際機場T1，此段行李可直掛，轉機時間約2小時20分鐘，可在機場內用餐或逛免稅店。'},
+        {time:'19:20', type:'spot', title:'搭機飛往桃園', tag:'交通',
+          transport:{mode:'walk', from:'', min:0, cost:0},
+          note:'國泰航空 CX464，從香港國際機場T1起飛，飛往臺灣桃園國際機場T1。'},
+        {time:'21:20', type:'spot', title:'抵達桃園機場', tag:'交通',
+          transport:{mode:'walk', from:'', min:0, cost:0},
+          note:'抵達臺灣桃園國際機場T1，入境後再自駕返回台中，結束整趟旅程，路上請注意行車安全。'}
       ]
     }
   ],
@@ -505,7 +563,8 @@ const flightData = {
 const transportMeta = {
   taxi:{icon:'🚕', label:'打車', cls:'taxi'},
   metro:{icon:'🚇', label:'地鐵', cls:'metro'},
-  walk:{icon:'🚶', label:'步行', cls:'walk'}
+  walk:{icon:'🚶', label:'步行', cls:'walk'},
+  drive:{icon:'🚗', label:'自駕', cls:'taxi'}
 };
 
 function renderFlightCard(key, label, cls){
@@ -791,9 +850,22 @@ fab.onclick=()=>{
 };
 
 /* ---------------- 分帳記帳 ---------------- */
+const expenseCategories = [
+  {key:'food', label:'餐飲', emoji:'🍜'},
+  {key:'stay', label:'住宿', emoji:'🏨'},
+  {key:'transport', label:'交通', emoji:'🚕'},
+  {key:'ticket', label:'門票娛樂', emoji:'🎟️'},
+  {key:'other', label:'其他', emoji:'🧾'}
+];
+function catInfo(key){ return expenseCategories.find(c=>c.key===key) || expenseCategories[expenseCategories.length-1]; }
+
+const POOL_KEY = '__pool__';
 const splitData = {
-  members: ['我'],
-  expenses: [] // {id, desc, amount, paidBy, splitAmong:[...]}
+  members: ['林家', '吳家', '伍家'],
+  deposits: {'林家': 0, '吳家': 0, '伍家': 0}, // 每家先繳的訂金
+  headcount: {'林家': 4, '吳家': 2, '伍家': 2}, // 每家人數，用來依人數比例分攤
+  lastDate: '2026-09-24',
+  expenses: [] // {id, desc, amount, date, category, paidBy, splitAmong:[...]}
 };
 let expenseIdSeq = 1;
 
@@ -802,17 +874,34 @@ function fmtMoney(n){
   return sign + '¥' + Math.abs(Math.round(n));
 }
 
+function headOf(m){ return Number(splitData.headcount[m])||1; }
+
+function computeExpenseShares(exp){
+  const among = exp.splitAmong.filter(m=> splitData.members.includes(m));
+  const shares = {};
+  const totalHeads = among.reduce((s,m)=> s+headOf(m), 0);
+  if(totalHeads<=0) return shares;
+  const perHead = exp.amount / totalHeads;
+  among.forEach(m=>{ shares[m] = perHead * headOf(m); });
+  return shares;
+}
+
 function computeBalances(){
   const balance = {};
-  splitData.members.forEach(m=> balance[m]=0);
+  splitData.members.forEach(m=> balance[m] = Number(splitData.deposits[m])||0);
   splitData.expenses.forEach(exp=>{
-    const among = exp.splitAmong.filter(m=> splitData.members.includes(m));
-    if(among.length===0) return;
-    const share = exp.amount / among.length;
-    if(balance[exp.paidBy]!==undefined) balance[exp.paidBy] += exp.amount;
-    among.forEach(m=>{ balance[m] -= share; });
+    const shares = computeExpenseShares(exp);
+    if(exp.paidBy!==POOL_KEY && balance[exp.paidBy]!==undefined) balance[exp.paidBy] += exp.amount;
+    Object.keys(shares).forEach(m=>{ balance[m] -= shares[m]; });
   });
   return balance;
+}
+
+function computeCategoryTotals(){
+  const totals = {};
+  expenseCategories.forEach(c=> totals[c.key]=0);
+  splitData.expenses.forEach(exp=>{ totals[exp.category] = (totals[exp.category]||0) + exp.amount; });
+  return totals;
 }
 
 function computeSettlements(balance){
@@ -844,32 +933,57 @@ function refreshSplitPanel(){
     `<div class="member-chip">${m}<button data-remove-member="${m}">×</button></div>`
   ).join('');
 
-  const payerOptions = splitData.members.map(m=>`<option value="${m}">${m}</option>`).join('');
+  const depositRows = splitData.members.map(m=>`
+    <div class="deposit-row">
+      <span class="name">${m}　<span class="head-badge">👪 ${headOf(m)}人</span></span>
+      <span class="deposit-inputs">
+        <input type="number" min="1" class="head-input" title="人數" data-head-member="${m}" value="${splitData.headcount[m]||1}">
+        <input type="number" min="0" class="deposit-input" title="訂金" data-deposit-member="${m}" value="${splitData.deposits[m]||0}">
+      </span>
+    </div>
+  `).join('');
+  const totalDeposit = splitData.members.reduce((s,m)=> s+(Number(splitData.deposits[m])||0), 0);
+  const totalHeadsAll = splitData.members.reduce((s,m)=> s+headOf(m), 0);
+
+  const payerOptions = `<option value="${POOL_KEY}">💰 公帳（訂金支付）</option>` +
+    splitData.members.map(m=>`<option value="${m}">${m}（個人代墊）</option>`).join('');
   const splitChecks = splitData.members.map(m=>
-    `<label class="split-check"><input type="checkbox" value="${m}" checked> ${m}</label>`
+    `<label class="split-check"><input type="checkbox" value="${m}" checked> ${m}（${headOf(m)}人）</label>`
   ).join('');
+  const categoryOptions = expenseCategories.map(c=>`<option value="${c.key}">${c.emoji} ${c.label}</option>`).join('');
 
   const totalAmount = splitData.expenses.reduce((s,e)=>s+e.amount,0);
   const balance = computeBalances();
   const settlements = computeSettlements(balance);
+  const catTotals = computeCategoryTotals();
+
+  const catStatsHtml = expenseCategories.map(c=>`
+    <div class="balance-row"><span class="name">${c.emoji} ${c.label}</span><span>${fmtMoney(catTotals[c.key]||0)}</span></div>
+  `).join('');
 
   const expenseListHtml = splitData.expenses.length===0
     ? `<div class="empty-hint">還沒有任何花費紀錄，新增一筆試試看吧</div>`
-    : splitData.expenses.slice().reverse().map(exp=>`
+    : splitData.expenses.slice().sort((a,b)=> (b.date||'').localeCompare(a.date||'') || b.id-a.id).map(exp=>{
+        const c = catInfo(exp.category);
+        const payerLabel = exp.paidBy===POOL_KEY ? '💰 公帳' : exp.paidBy;
+        const dateLabel = exp.date ? exp.date.slice(5).replace('-','/') + '　' : '';
+        const shares = computeExpenseShares(exp);
+        const shareText = exp.splitAmong.map(m=> `${m} ${fmtMoney(shares[m]||0)}`).join('、');
+        return `
         <div class="expense-item">
           <button class="del-exp" data-del-exp="${exp.id}">✕</button>
           <div class="top">
-            <div class="desc">${exp.desc}</div>
+            <div class="desc"><span class="cat-tag">${c.emoji} ${c.label}</span>${exp.desc}</div>
             <div class="amount">${fmtMoney(exp.amount)}</div>
           </div>
-          <div class="meta">由 <b>${exp.paidBy}</b> 支付　·　${exp.splitAmong.length} 人均分（每人 ${fmtMoney(exp.amount/(exp.splitAmong.length||1))}）<br>分攤：${exp.splitAmong.join('、')}</div>
-        </div>
-      `).join('');
+          <div class="meta">${dateLabel}由 <b>${payerLabel}</b> 支付　·　依人數比例分攤<br>${shareText}</div>
+        </div>`;
+      }).join('');
 
   const balanceRows = splitData.members.map(m=>{
     const v = Math.round((balance[m]||0)*100)/100;
     const cls = v>0.5? 'positive' : (v<-0.5? 'negative':'zero');
-    const label = v>0.5? '應收回' : (v<-0.5? '應付出':'已結清');
+    const label = v>0.5? '多退' : (v<-0.5? '少補':'剛好結清');
     return `<div class="balance-row"><span class="name">${m}</span><span>${label}　<span class="amt ${cls}">${fmtMoney(Math.abs(v))}</span></span></div>`;
   }).join('');
 
@@ -880,7 +994,7 @@ function refreshSplitPanel(){
       `).join('');
 
   panel.innerHTML = `
-    <div class="day-title"><div><h2>分帳記帳</h2><div class="day-note">記錄旅途花費，自動計算每人該收／該付多少</div></div></div>
+    <div class="day-title"><div><h2>分帳記帳</h2><div class="day-note">每人先繳訂金，花費從公帳支出，最後多退少補<br>※ 個人花費（自己買的東西）不列入記帳</div></div></div>
 
     <div class="split-section">
       <h3>成員</h3>
@@ -892,8 +1006,27 @@ function refreshSplitPanel(){
     </div>
 
     <div class="split-section">
+      <h3>各家人數與訂金</h3>
+      <div class="day-note" style="margin:-4px 0 10px;">公帳花費會依各家人數比例分攤，例如 ¥80 由 4 人的林家與各 2 人的吳家、伍家分攤，林家 ¥40、吳家 ¥20、伍家 ¥20</div>
+      <div class="summary-card">
+        ${depositRows}
+        <div class="total-row" style="margin-top:8px; border-top:1px dashed var(--line); border-bottom:none; padding-top:10px; padding-bottom:0;">
+          <span class="label">總人數 ${totalHeadsAll} 人　·　訂金總額</span><span class="value" style="font-size:18px;">${fmtMoney(totalDeposit)}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="split-section">
       <h3>新增花費</h3>
       <div class="expense-form">
+        <div class="row">
+          <label>類別</label>
+          <select id="expCategory">${categoryOptions}</select>
+        </div>
+        <div class="row">
+          <label>日期</label>
+          <input type="date" id="expDate" min="2026-09-24" max="2026-09-28" value="${splitData.lastDate||'2026-09-24'}">
+        </div>
         <div class="row">
           <label>項目名稱</label>
           <input type="text" id="expDesc" placeholder="例如：晚餐 / 打車 / 門票">
@@ -903,7 +1036,7 @@ function refreshSplitPanel(){
           <input type="number" id="expAmount" min="0" placeholder="0">
         </div>
         <div class="row">
-          <label>誰先付的錢</label>
+          <label>錢是誰付的</label>
           <select id="expPaidBy">${payerOptions}</select>
         </div>
         <div class="row">
@@ -920,7 +1053,14 @@ function refreshSplitPanel(){
     </div>
 
     <div class="split-section">
-      <h3>結算總覽</h3>
+      <h3>依類別統計</h3>
+      <div class="summary-card">
+        ${catStatsHtml}
+      </div>
+    </div>
+
+    <div class="split-section">
+      <h3>結算總覽（多退少補）</h3>
       <div class="summary-card">
         <div class="total-row"><span class="label">目前總花費</span><span class="value">${fmtMoney(totalAmount)}</span></div>
         ${balanceRows}
@@ -939,6 +1079,8 @@ function refreshSplitPanel(){
       const involved = splitData.expenses.some(e=> e.paidBy===name || e.splitAmong.includes(name));
       if(involved && !confirm(`「${name}」已有相關花費紀錄，移除成員將一併從紀錄中移除，確定嗎？`)) return;
       splitData.members = splitData.members.filter(m=>m!==name);
+      delete splitData.deposits[name];
+      delete splitData.headcount[name];
       splitData.expenses.forEach(e=>{ e.splitAmong = e.splitAmong.filter(m=>m!==name); });
       splitData.expenses = splitData.expenses.filter(e=> e.paidBy!==name);
       refreshSplitPanel();
@@ -951,10 +1093,26 @@ function refreshSplitPanel(){
     if(name==='') return;
     if(splitData.members.includes(name)){ alert('這個名字已經存在囉'); return; }
     splitData.members.push(name);
+    splitData.deposits[name] = 0;
+    splitData.headcount[name] = 1;
     refreshSplitPanel();
   };
   panel.querySelector('#newMemberInput').addEventListener('keydown', (e)=>{
     if(e.key==='Enter'){ e.preventDefault(); panel.querySelector('#addMemberBtn').click(); }
+  });
+
+  panel.querySelectorAll('[data-deposit-member]').forEach(inp=>{
+    inp.addEventListener('change', ()=>{
+      splitData.deposits[inp.dataset.depositMember] = Number(inp.value)||0;
+      refreshSplitPanel();
+    });
+  });
+
+  panel.querySelectorAll('[data-head-member]').forEach(inp=>{
+    inp.addEventListener('change', ()=>{
+      splitData.headcount[inp.dataset.headMember] = Math.max(1, Number(inp.value)||1);
+      refreshSplitPanel();
+    });
   });
 
   panel.querySelector('#selectAllBtn').onclick=()=>{
@@ -962,6 +1120,8 @@ function refreshSplitPanel(){
   };
 
   panel.querySelector('#addExpenseBtn').onclick=()=>{
+    const category = panel.querySelector('#expCategory').value;
+    const date = panel.querySelector('#expDate').value || splitData.lastDate;
     const desc = panel.querySelector('#expDesc').value.trim();
     const amount = Number(panel.querySelector('#expAmount').value);
     const paidBy = panel.querySelector('#expPaidBy').value;
@@ -969,7 +1129,8 @@ function refreshSplitPanel(){
     if(desc===''){ alert('請輸入項目名稱'); return; }
     if(!amount || amount<=0){ alert('請輸入正確的金額'); return; }
     if(among.length===0){ alert('請至少選擇一位分攤的人'); return; }
-    splitData.expenses.push({id:expenseIdSeq++, desc, amount, paidBy, splitAmong:among});
+    splitData.expenses.push({id:expenseIdSeq++, desc, amount, date, category, paidBy, splitAmong:among});
+    splitData.lastDate = date;
     refreshSplitPanel();
   };
 
@@ -989,28 +1150,41 @@ function exportSplitToExcel(){
     alert('目前沒有網路連線，暫時無法匯出 Excel，請連上網路後再試一次。');
     return;
   }
-  if(splitData.expenses.length===0){
-    alert('目前還沒有花費紀錄，先新增幾筆花費再匯出喔！');
+  const hasDeposit = splitData.members.some(m=> (Number(splitData.deposits[m])||0) > 0);
+  if(splitData.expenses.length===0 && !hasDeposit){
+    alert('目前還沒有任何訂金或花費紀錄，先輸入一些資料再匯出喔！');
     return;
   }
 
-  const expenseRows = splitData.expenses.map(e=>({
-    '項目': e.desc,
-    '金額(¥)': e.amount,
-    '付款人': e.paidBy,
-    '分攤人數': e.splitAmong.length,
-    '分攤對象': e.splitAmong.join('、'),
-    '每人分攤(¥)': Math.round(e.amount / e.splitAmong.length)
-  }));
-  const totalRow = {'項目':'總計', '金額(¥)': splitData.expenses.reduce((s,e)=>s+e.amount,0), '付款人':'', '分攤人數':'', '分攤對象':'', '每人分攤(¥)':''};
+  const expenseRows = splitData.expenses.slice().sort((a,b)=> (a.date||'').localeCompare(b.date||'') || a.id-b.id).map(e=>{
+    const c = catInfo(e.category);
+    const shares = computeExpenseShares(e);
+    const shareText = e.splitAmong.map(m=> `${m} ¥${Math.round(shares[m]||0)}`).join('、');
+    return {
+      '日期': e.date || '',
+      '類別': `${c.emoji} ${c.label}`,
+      '項目': e.desc,
+      '金額(¥)': e.amount,
+      '付款人': e.paidBy===POOL_KEY? '公帳（訂金支付）' : e.paidBy,
+      '分攤家庭': e.splitAmong.join('、'),
+      '各家分攤金額': shareText
+    };
+  });
+  const totalRow = {'日期':'', '類別':'', '項目':'總計', '金額(¥)': splitData.expenses.reduce((s,e)=>s+e.amount,0), '付款人':'', '分攤家庭':'', '各家分攤金額':''};
   expenseRows.push(totalRow);
+
+  const depositRowsX = splitData.members.map(m=>({'家庭': m, '人數': headOf(m), '已繳訂金(¥)': Number(splitData.deposits[m])||0}));
+  depositRowsX.push({'家庭':'總計', '人數': splitData.members.reduce((s,m)=>s+headOf(m),0), '已繳訂金(¥)': splitData.members.reduce((s,m)=>s+(Number(splitData.deposits[m])||0),0)});
+
+  const catTotalsX = computeCategoryTotals();
+  const catRowsX = expenseCategories.map(c=>({'類別': `${c.emoji} ${c.label}`, '花費金額(¥)': catTotalsX[c.key]||0}));
 
   const balance = computeBalances();
   const balanceRows = splitData.members.map(m=>{
     const v = Math.round((balance[m]||0)*100)/100;
     return {
       '成員': m,
-      '狀態': v>0.5? '應收回' : (v<-0.5? '應付出' : '已結清'),
+      '狀態': v>0.5? '多退' : (v<-0.5? '少補' : '剛好結清'),
       '金額(¥)': Math.abs(v)
     };
   });
@@ -1021,7 +1195,9 @@ function exportSplitToExcel(){
     : [{'付款人':'-', '收款人':'-', '金額(¥)':'目前帳務已平衡，不需轉帳'}];
 
   const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(depositRowsX), '訂金');
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(expenseRows), '花費明細');
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(catRowsX), '依類別統計');
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(balanceRows), '結算總覽');
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(settleRows), '建議轉帳');
 
