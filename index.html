@@ -7,6 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <style>
   :root{
     --ink:#1B1B1F;
@@ -319,6 +321,13 @@
   }
   .deposit-inputs .head-input{width:52px;}
   .deposit-inputs .deposit-input{width:90px;}
+  .sync-badge{
+    display:inline-block; font-size:11px; font-weight:700; padding:4px 10px; border-radius:20px;
+    margin:8px 0 4px;
+  }
+  .sync-badge.sync-ok{background:rgba(31,122,92,0.12); color:var(--jade);}
+  .sync-badge.sync-mid{background:rgba(216,155,46,0.16); color:#8a611b;}
+  .sync-badge.sync-off{background:rgba(196,57,42,0.10); color:var(--red-deep);}
   .cat-tag{
     display:inline-block; font-size:10.5px; font-weight:700; background:var(--paper2); color:var(--ink);
     border-radius:20px; padding:2px 8px; margin-right:6px; border:1px solid var(--line);
@@ -860,14 +869,82 @@ const expenseCategories = [
 function catInfo(key){ return expenseCategories.find(c=>c.key===key) || expenseCategories[expenseCategories.length-1]; }
 
 const POOL_KEY = '__pool__';
-const splitData = {
+const defaultSplitData = {
   members: ['林家', '吳家', '伍家'],
   deposits: {'林家': 0, '吳家': 0, '伍家': 0}, // 每家先繳的訂金
   headcount: {'林家': 4, '吳家': 2, '伍家': 2}, // 每家人數，用來依人數比例分攤
   lastDate: '2026-09-24',
   expenses: [] // {id, desc, amount, date, category, paidBy, splitAmong:[...]}
 };
-let expenseIdSeq = 1;
+let splitData = JSON.parse(JSON.stringify(defaultSplitData));
+
+function newExpenseId(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+
+/* ---------------- Firebase 即時同步 ---------------- */
+const firebaseConfig = {
+  apiKey: "AIzaSyBHVeHYaYDnkXd308WulJlonNiq2i4fl6Y",
+  authDomain: "guangzhou-4da44.firebaseapp.com",
+  databaseURL: "https://guangzhou-4da44-default-rtdb.firebaseio.com",
+  projectId: "guangzhou-4da44",
+  storageBucket: "guangzhou-4da44.firebasestorage.app",
+  messagingSenderId: "936761744052",
+  appId: "1:936761744052:web:8891398b6bba94e478d5e1"
+};
+
+let splitRef = null;
+let firebaseReady = false;
+let suppressNextRemoteEcho = false;
+
+function initFirebaseSync(){
+  try{
+    if(typeof firebase === 'undefined'){ console.warn('Firebase SDK 未載入，分帳資料僅會保存在本機瀏覽器'); return; }
+    const app = firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    splitRef = db.ref('splitData');
+    splitRef.on('value', (snap)=>{
+      const val = snap.val();
+      if(val){
+        splitData = val;
+        if(!splitData.deposits) splitData.deposits = {};
+        if(!splitData.headcount) splitData.headcount = {};
+        if(!splitData.expenses) splitData.expenses = [];
+        if(!splitData.members) splitData.members = [];
+      } else {
+        // 資料庫是空的，把預設資料寫進去，當作大家的起始狀態
+        splitData = JSON.parse(JSON.stringify(defaultSplitData));
+        splitRef.set(splitData);
+      }
+      firebaseReady = true;
+      updateSyncBadge('synced');
+      refreshSplitPanel();
+    }, (err)=>{
+      console.warn('Firebase 讀取失敗', err);
+      updateSyncBadge('offline');
+    });
+  }catch(e){
+    console.warn('Firebase 初始化失敗，分帳資料僅會保存在本機瀏覽器', e);
+  }
+}
+
+function pushSplitData(){
+  if(splitRef){
+    updateSyncBadge('syncing');
+    splitRef.set(splitData).then(()=> updateSyncBadge('synced')).catch(()=> updateSyncBadge('offline'));
+  }
+}
+
+function updateSyncBadge(state){
+  const el = document.getElementById('syncBadge');
+  if(!el) return;
+  const map = {
+    synced: {text:'☁️ 已同步（大家都看得到）', cls:'sync-ok'},
+    syncing: {text:'☁️ 同步中…', cls:'sync-mid'},
+    offline: {text:'⚠️ 離線，僅存本機', cls:'sync-off'}
+  };
+  const m = map[state] || map.offline;
+  el.textContent = m.text;
+  el.className = 'sync-badge ' + m.cls;
+}
 
 function fmtMoney(n){
   const sign = n<0? '-' : '';
@@ -995,6 +1072,7 @@ function refreshSplitPanel(){
 
   panel.innerHTML = `
     <div class="day-title"><div><h2>分帳記帳</h2><div class="day-note">每人先繳訂金，花費從公帳支出，最後多退少補<br>※ 個人花費（自己買的東西）不列入記帳</div></div></div>
+    <div id="syncBadge" class="sync-badge sync-mid">☁️ 連線中…</div>
 
     <div class="split-section">
       <h3>成員</h3>
@@ -1083,6 +1161,7 @@ function refreshSplitPanel(){
       delete splitData.headcount[name];
       splitData.expenses.forEach(e=>{ e.splitAmong = e.splitAmong.filter(m=>m!==name); });
       splitData.expenses = splitData.expenses.filter(e=> e.paidBy!==name);
+      pushSplitData();
       refreshSplitPanel();
     };
   });
@@ -1095,6 +1174,7 @@ function refreshSplitPanel(){
     splitData.members.push(name);
     splitData.deposits[name] = 0;
     splitData.headcount[name] = 1;
+    pushSplitData();
     refreshSplitPanel();
   };
   panel.querySelector('#newMemberInput').addEventListener('keydown', (e)=>{
@@ -1104,6 +1184,7 @@ function refreshSplitPanel(){
   panel.querySelectorAll('[data-deposit-member]').forEach(inp=>{
     inp.addEventListener('change', ()=>{
       splitData.deposits[inp.dataset.depositMember] = Number(inp.value)||0;
+      pushSplitData();
       refreshSplitPanel();
     });
   });
@@ -1111,6 +1192,7 @@ function refreshSplitPanel(){
   panel.querySelectorAll('[data-head-member]').forEach(inp=>{
     inp.addEventListener('change', ()=>{
       splitData.headcount[inp.dataset.headMember] = Math.max(1, Number(inp.value)||1);
+      pushSplitData();
       refreshSplitPanel();
     });
   });
@@ -1129,15 +1211,17 @@ function refreshSplitPanel(){
     if(desc===''){ alert('請輸入項目名稱'); return; }
     if(!amount || amount<=0){ alert('請輸入正確的金額'); return; }
     if(among.length===0){ alert('請至少選擇一位分攤的人'); return; }
-    splitData.expenses.push({id:expenseIdSeq++, desc, amount, date, category, paidBy, splitAmong:among});
+    splitData.expenses.push({id:newExpenseId(), desc, amount, date, category, paidBy, splitAmong:among});
     splitData.lastDate = date;
+    pushSplitData();
     refreshSplitPanel();
   };
 
   panel.querySelectorAll('[data-del-exp]').forEach(btn=>{
     btn.onclick=()=>{
-      const id = Number(btn.dataset.delExp);
-      splitData.expenses = splitData.expenses.filter(e=>e.id!==id);
+      const id = btn.dataset.delExp;
+      splitData.expenses = splitData.expenses.filter(e=>String(e.id)!==String(id));
+      pushSplitData();
       refreshSplitPanel();
     };
   });
@@ -1206,6 +1290,7 @@ function exportSplitToExcel(){
 
 render();
 bindFlightInputs();
+initFirebaseSync();
 </script>
 </body>
 </html>
