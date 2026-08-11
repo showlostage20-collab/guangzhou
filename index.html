@@ -354,12 +354,22 @@
   .deposit-inputs .head-input{width:52px;}
   .deposit-inputs .deposit-input{width:90px;}
   .sync-badge{
-    display:inline-block; font-size:11px; font-weight:700; padding:4px 10px; border-radius:20px;
-    margin:8px 0 4px;
+    display:block; font-size:13px; font-weight:900; padding:9px 14px; border-radius:12px;
+    margin:8px 0 12px; border:2px solid currentColor; text-align:center;
   }
   .sync-badge.sync-ok{background:rgba(31,122,92,0.12); color:var(--jade);}
   .sync-badge.sync-mid{background:rgba(216,155,46,0.16); color:#8a611b;}
   .sync-badge.sync-off{background:rgba(196,57,42,0.10); color:var(--red-deep);}
+
+  .export-card{
+    display:inline-flex; align-items:center; gap:6px; margin:0 0 18px;
+    padding:6px 12px; border-radius:20px; border:1.5px solid var(--jade);
+    background:rgba(31,122,92,0.08); color:var(--jade); cursor:pointer; font-family:inherit;
+    text-align:left;
+  }
+  .export-card:active{background:rgba(31,122,92,0.18);}
+  .export-card .export-icon{font-size:12px; flex:0 0 auto;}
+  .export-card .export-title{font-weight:700; font-size:11.5px;}
   .cat-tag{
     display:inline-block; font-size:10.5px; font-weight:700; background:var(--paper2); color:var(--ink);
     border-radius:20px; padding:2px 8px; margin-right:6px; border:1px solid var(--line);
@@ -385,7 +395,7 @@
 <body>
 
 <div class="hero">
-  <div class="eyebrow">5 DAYS · 广州 · 佛山 · 顺德</div>
+  <div class="eyebrow">5 DAYS · 廣州 · 佛山 · 順德</div>
   <h1>嗚啦啦<span>廣州順德</span>之旅</h1>
   <p class="sub">2026.09.24 – 09.28　老城騎樓 × 批發淘貨 × 佛山順德 × 小蠻腰快閃 — 全程以打車／地鐵移動</p>
   <div class="base-card">
@@ -469,7 +479,7 @@ const tripData = {
       ]
     },
     {
-      id:'d2', num:'叁', label:'DAY 3', date:'09/26', title:'佛山順德　美食日',
+      id:'d2', num:'參', label:'DAY 3', date:'09/26', title:'佛山順德　美食日',
       note:'佛山祖廟．嶺南天地．清暉園．華蓋路．漁人碼頭',
       stops:[
         {time:'08:00', type:'spot', title:'出發前往佛山', tag:'交通',
@@ -494,7 +504,7 @@ const tripData = {
           note:'順德的美食＋老街＋小吃＋購物集中地，順德甜品與正餐都在附近解決。必吃：韋記牛雜湯（牛雜四件套：牛雜、蘿蔔、麵筋、豆泡）、阿三麻蓉湯圓（紅豆雙皮奶配糯叽叽湯圓）；街尾的華蓋山棧道可以俯瞰整條街的熱鬧景象，也是熱門拍照點。'},
         {time:'14:30', type:'food', title:'順德甜品：仁信老舖 / 民信老舖', tag:'必吃',
           transport:{mode:'walk', from:'華蓋路', min:3, cost:0},
-          note:'順德最經典的雙皮奶、薑撞奶、炸牛奶、倫教糕都在這裡，仁信老舖是大良經典甜品站。民信老舖的「原隻椰子燉奶」是招牌創新甜品（在雙皮奶工藝基礎上加入椰皇與水牛奶），3樓還有雙皮奶博物館可以了解製作歷史；金榜街一帶的水牛奶（欢记牛乳、梯底牛乳鋪）也是在地人氣飲品，比一般牛奶濃郁香滑。',
+          note:'順德最經典的雙皮奶、薑撞奶、炸牛奶、倫教糕都在這裡，仁信老舖是大良經典甜品站。民信老舖的「原隻椰子燉奶」是招牌創新甜品（在雙皮奶工藝基礎上加入椰皇與水牛奶），3樓還有雙皮奶博物館可以了解製作歷史；金榜街一帶的水牛奶（歡記牛乳、梯底牛乳鋪）也是在地人氣飲品，比一般牛奶濃郁香滑。',
           address:'仁信老舖：佛山市順德區東苑路　／　民信老舖：佛山市順德區東樂路', phone:'-'},
         {time:'16:00', type:'food', title:'順德正餐', tag:'必吃',
           transport:{mode:'walk', from:'甜品店', min:5, cost:0},
@@ -1172,6 +1182,11 @@ function refreshSplitPanel(){
     <div class="day-title"><div><h2>分帳記帳</h2><div class="day-note">每人先繳訂金，花費從公帳支出，最後多退少補<br>※ 個人花費（自己買的東西）不列入記帳</div></div></div>
     <div id="syncBadge" class="sync-badge sync-mid">☁️ 連線中…</div>
 
+    <button class="export-card" id="exportExcelBtn">
+      <span class="export-icon">📊</span>
+      <span class="export-title">匯出成 Excel</span>
+    </button>
+
     <div class="split-section">
       <h3>成員</h3>
       <div class="member-chips">${memberChips}</div>
@@ -1243,7 +1258,6 @@ function refreshSplitPanel(){
       </div>
       <h3 style="margin-top:6px;">建議轉帳</h3>
       ${settleHtml}
-      <button class="submit-btn" id="exportExcelBtn" style="margin-top:14px; background:var(--jade);">📤 匯出成 Excel</button>
     </div>
 
     <div class="split-section" id="sec-list">
