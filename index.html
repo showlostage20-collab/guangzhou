@@ -284,19 +284,22 @@
     font-weight:700; font-size:14px; font-family:inherit; cursor:pointer; margin-top:4px;
   }
 
-  .expense-item{border:1.5px solid var(--line); border-radius:var(--radius); padding:12px 14px; margin-bottom:8px; background:#fff; position:relative;}
+  .expense-item{border:1.5px solid var(--line); border-radius:var(--radius); padding:12px 14px 10px; margin-bottom:8px; background:#fff; position:relative;}
   .expense-item.editing{border-color:var(--gold); background:#FFFDF7;}
   .expense-item .top{display:flex; justify-content:space-between; align-items:flex-start; gap:8px;}
-  .expense-item .desc{font-weight:700; font-size:14px; padding-right:44px;}
+  .expense-item .desc{font-weight:700; font-size:14px;}
   .expense-item .amount{font-family:'Noto Serif TC',serif; font-weight:900; font-size:16px; color:var(--red-deep); flex:0 0 auto;}
   .expense-item .meta{font-size:11.5px; color:#8b8b90; margin-top:5px; line-height:1.6;}
-  .expense-item .item-actions{position:absolute; top:8px; right:8px; display:flex; gap:2px;}
+  .expense-item .item-actions{display:flex; gap:8px; margin-top:10px; padding-top:10px; border-top:1px dashed var(--line);}
   .expense-item .item-actions button{
-    border:none; background:none; color:#b6b6ba; font-size:14px;
-    cursor:pointer; line-height:1; padding:4px 6px; border-radius:6px;
+    flex:1; display:flex; align-items:center; justify-content:center; gap:5px;
+    border-radius:20px; font-size:12.5px; font-weight:700; cursor:pointer; padding:7px 10px;
+    font-family:inherit;
   }
-  .expense-item .item-actions .edit-exp:hover{background:rgba(216,155,46,0.15); color:#8a611b;}
-  .expense-item .item-actions .del-exp:hover{background:rgba(196,57,42,0.12); color:var(--red-deep);}
+  .expense-item .item-actions .edit-exp{border:1.5px solid var(--gold); background:#FFF7E8; color:#8a611b;}
+  .expense-item .item-actions .edit-exp:active{background:rgba(216,155,46,0.28);}
+  .expense-item .item-actions .del-exp{border:1.5px solid var(--red-deep); background:#FFF1EF; color:var(--red-deep);}
+  .expense-item .item-actions .del-exp:active{background:rgba(196,57,42,0.20);}
   .empty-hint{font-size:12.5px; color:#9a9a9f; text-align:center; padding:14px 0;}
 
   .summary-card{border:1.5px solid var(--ink); border-radius:var(--radius); background:var(--paper2); padding:14px; box-shadow:var(--shadow); margin-bottom:16px;}
@@ -1108,15 +1111,15 @@ function refreshSplitPanel(){
         const shareText = exp.splitAmong.map(m=> `${m} ${fmtMoney(shares[m]||0)}`).join('、');
         return `
         <div class="expense-item">
-          <div class="item-actions">
-            <button class="edit-exp" data-edit-exp="${exp.id}">✎</button>
-            <button class="del-exp" data-del-exp="${exp.id}">✕</button>
-          </div>
           <div class="top">
             <div class="desc"><span class="cat-tag">${c.emoji} ${c.label}</span>${exp.desc}</div>
             <div class="amount">${fmtMoney(exp.amount)}</div>
           </div>
           <div class="meta">${dateLabel}由 <b>${payerLabel}</b> 支付　·　依人數比例分攤<br>${shareText}</div>
+          <div class="item-actions">
+            <button class="edit-exp" data-edit-exp="${exp.id}">✎ 編輯</button>
+            <button class="del-exp" data-del-exp="${exp.id}">🗑 刪除</button>
+          </div>
         </div>`;
       }).join('');
 
