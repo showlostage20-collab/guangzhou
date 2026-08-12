@@ -112,6 +112,12 @@
   .summary .item.cost .value{color:var(--red-deep);}
   .summary .divider{width:1px; background:var(--line);}
   .summary .hint{width:100%; font-size:10.5px; color:#8b8b90; text-align:center; margin-top:6px;}
+  .recalc-btn{
+    display:block; width:100%; margin-top:8px; padding:9px; border-radius:10px;
+    border:1.5px dashed var(--blue); background:rgba(43,72,112,0.06); color:var(--blue);
+    font-family:inherit; font-size:11.5px; font-weight:700; cursor:pointer;
+  }
+  .recalc-btn:active{background:rgba(43,72,112,0.14);}
 
   /* Flight cards */
   .flight-card{
@@ -424,7 +430,7 @@
 
 <script>
 /* ---------------- 資料 ---------------- */
-const tripData = {
+const defaultTripData = {
   days: [
     {
       id:'d0', num:'壹', label:'DAY 1', date:'09/24', title:'抵達廣州　入境轉移',
@@ -437,21 +443,26 @@ const tripData = {
           transport:{mode:'drive', from:'台中', min:135, cost:0},
           note:'班機 10:50 起飛，航空公司建議至少提前 3 小時抵達機場辦理登機手續，7:30 到場含停車、拖運行李、通關安檢時間算是比較保險。停車場費用約每日最高 490 元（機場內），或選機場周邊民營停車場較划算；此段自駕油資／過路費約落在新台幣600–800元，屬台幣支出，未列入下方廣州行程的人民幣花費總計中。'},
         {time:'15:30', type:'spot', title:'抵達南沙港客運碼頭', tag:'入境',
+          coords:{lat:22.7157,lng:113.5266},
           transport:{mode:'walk', from:'', min:0, cost:0},
           note:'香港－廣州航段（國泰航空 CX9845／珠江客運 3A 代碼共享）抵達南沙港客運碼頭，準備辦理入境登記手續。'},
         {time:'15:40', type:'spot', title:'入境登記／通關', tag:'入境',
           transport:{mode:'walk', from:'', min:0, cost:0},
           note:'辦理入境登記、行李提領與通關手續，預留約 40–60 分鐘較保險，尖峰時段可能更久。'},
         {time:'16:30', type:'spot', title:'前往民宿', tag:'交通',
+          coords:{lat:23.1291,lng:113.2705},
           transport:{mode:'taxi', from:'南沙港客運碼頭', min:75, cost:150},
           note:'南沙距離市區較遠，打車前往北京路約需 60–90 分鐘（依路況浮動），建議上車前先確認車資，可考慮多人共乘分攤車費。'},
         {time:'18:00', type:'spot', title:'民宿check-in', tag:'住宿',
+          coords:{lat:23.1291,lng:113.2705},
           transport:{mode:'walk', from:'', min:0, cost:0},
           note:'北京路步行街／吾悅廣場民宿，辦理入住、放下行李稍作休息，準備吃晚餐。'},
         {time:'19:00', type:'spot', title:'北京路夜市晚餐', tag:'夜市／步行街',
+          coords:{lat:23.1291,lng:113.2705},
           transport:{mode:'walk', from:'民宿', min:5, cost:0},
           note:'必看「北京路千年古道」玻璃地面遺跡；晚上沿路是廣州最熱鬧的步行街之一，可順道逛吾悅廣場。必吃：阿姨牛雜（1988年老店，蘿蔔牛雜湯汁濃郁）、步步高昇缽仔糕（純手工製作，人氣款需提前一天預訂）；北京路的府學西街塗鴉牆、大佛古寺夜景也適合順路拍照。剛落地舟車勞頓，這晚建議早點休息，養足精神迎接接下來三天的行程。'},
         {time:'21:00', type:'spot', title:'返回民宿', tag:'回程',
+          coords:{lat:23.1291,lng:113.2705},
           transport:{mode:'walk', from:'北京路夜市', min:5, cost:0},
           note:'北京路夜市步行即可回到吾悅廣場民宿，結束抵達日行程。'}
       ]
@@ -461,28 +472,35 @@ const tripData = {
       note:'越秀公園．陳家祠．永慶坊．上下九',
       stops:[
         {time:'09:00', type:'spot', title:'越秀公園', tag:'景點',
+          coords:{lat:23.1367,lng:113.2665},
           transport:{mode:'taxi', from:'民宿', min:12, cost:15},
           note:'廣州地標公園，園內「五羊石像」是廣州「羊城」別稱由來，也是老廣州人假日散步的地方，可順道望見中山紀念碑。'},
         {time:'11:00', type:'spot', title:'陳家祠', tag:'景點',
+          coords:{lat:23.1257,lng:113.2504},
           transport:{mode:'metro', from:'越秀公園', min:20, cost:4},
           note:'原為清代廣東各地陳氏宗族合資興建的書院「陳氏書院」，以木雕、石雕、磚雕、灰塑、陶塑「五雕」聞名，是嶺南建築藝術的代表作。必看重點：正門兩側6幅大型磚雕《梁山聚義》《梧桐杏柳鳳凰群》，工藝細膩層次分明；後座11座雙層透雕神龕；還有16扇雙面鏤空木雕屏門，被譽為「用木頭雕就的歷史故事長廊」，非常適合拍照。'},
         {time:'12:30', type:'food', title:'午餐：點都德 / 陶陶居', tag:'必吃',
+          coords:{lat:23.1291,lng:113.2705},
           transport:{mode:'taxi', from:'陳家祠', min:10, cost:15},
           note:'兩間都是廣州代表性早茶品牌。必點：招牌蝦餃皇、金莎海蝦紅米腸、蜜汁叉燒包、鮮蝦流沙包、特色蒸排骨、鳳爪；陶陶居創於1880年，是廣州最古老酒樓之一，招牌凍爪、虎皮鳳爪、榴槤酥也常被推薦。小提醒：這兩家對遊客很方便，但部分本地老饕會覺得偏「預製、不夠新鮮」，若想吃更道地的早茶可以留意附近蓮香樓等老字號。',
           address:'點都德：廣州市越秀區北京路352號　／　陶陶居：廣州市越秀區北京路168號附近',
           phone:'+862083522927'},
         {time:'14:00', type:'spot', title:'永慶坊', tag:'景點',
+          coords:{lat:23.1252,lng:113.2419},
           transport:{mode:'taxi', from:'北京路', min:15, cost:18},
           note:'荔灣區老西關改造街區，保留西關老屋、騎樓建築，李小龍祖居也在此，現在進駐許多文創小店與咖啡館，是廣州最好拍照的地方之一。必打卡：月亮橋（晚上7點後亮燈，水面倒影很美）、粵劇藝術博物館（免費入場，園林式建築，每天約11:00/15:00/19:30有免費粵劇折子戲）、黑金配色的「鐘書閣」網紅書店、活字印刷體驗館。美食可留意凌記（豬手撈粗面）、信牛奶甜品專家（椰汁馬蹄爽、雙皮奶）等在地熱門小店。'},
         {time:'16:00', type:'spot', title:'上下九步行街', tag:'景點',
+          coords:{lat:23.1183,lng:113.2477},
           transport:{mode:'taxi', from:'永慶坊', min:10, cost:12},
           note:'老廣州代表性商業步行街，可逛荔灣廣場、西關大屋與各式老字號，是「老廣州＋小吃＋平價購物」的縮影。必吃老字號：銀記腸粉（創於1935年，牛肉腸粉是招牌）、寶華麵店（鮮蝦雲吞麵，蝦仁彈牙）、陳添記（爽魚皮、艇仔粥）；也可買泮塘馬蹄糕、臘味手信帶回家。'},
         {time:'17:30', type:'food', title:'晚餐：陳添記 / 銀記腸粉店', tag:'必吃',
+          coords:{lat:23.1200,lng:113.2500},
           transport:{mode:'walk', from:'上下九', min:5, cost:0},
           note:'陳添記祖傳爽魚皮處理極淨，口感爽脆彈牙，拌花生、薑絲與秘製醬油，配一碗料多豐富的艇仔粥就是最正宗西關風味；銀記腸粉店則是廣州腸粉老字號，招牌牛肉腸粉粉皮薄如蟬翼，值得一試。',
           address:'陳添記：廣州市荔灣區　／　銀記腸粉店：廣州市越秀區北京路惠福東路519號',
           phone:'+862083177149'},
         {time:'19:00', type:'spot', title:'返回民宿', tag:'回程',
+          coords:{lat:23.1291,lng:113.2705},
           transport:{mode:'taxi', from:'晚餐地點', min:15, cost:18},
           note:'昨晚已經逛過北京路夜市，今天用完晚餐可以直接回民宿休息，養精蓄銳準備明天的佛山順德一日遊。'}
       ]
@@ -492,37 +510,47 @@ const tripData = {
       note:'佛山祖廟．嶺南天地．清暉園．華蓋路．漁人碼頭',
       stops:[
         {time:'08:00', type:'spot', title:'出發前往佛山', tag:'交通',
+          coords:{lat:23.0281,lng:113.1216},
           transport:{mode:'taxi', from:'民宿', min:45, cost:95},
           note:'建議 2–4 人可直接打車前往佛山，比轉乘城際更省時間。'},
         {time:'09:00', type:'spot', title:'佛山祖廟', tag:'景點',
+          coords:{lat:23.0281,lng:113.1216},
           transport:{mode:'walk', from:'', min:0, cost:0},
           note:'佛山代表性景點，可看黃飛鴻、葉問武術文化與嶺南建築工藝，是佛山歷史文化的縮影。必看：萬福台（華南最完整的古戲台，建於清順治年間）、靈應牌坊（明代木石牌坊，兼具避雷功能，拍照必打卡）、正殿陶塑瓦脊「花脊之王」；黃飛鴻紀念館與葉問堂內有醒獅表演，時間約每天 10:00–10:40、14:15–14:55、15:30–16:10，建議提早到場佔位。安排約 1.5–2 小時。',
           address:'佛山市禪城區桂城', phone:'-'},
         {time:'10:30', type:'spot', title:'嶺南天地', tag:'景點',
+          coords:{lat:23.0270,lng:113.1235},
           transport:{mode:'walk', from:'祖廟', min:5, cost:0},
           note:'比純觀光景區更有生活感的老街區，結合老街、餐廳、咖啡與文創小店，很適合拍照散步。非遺體驗區可看竹編、佛山剪紙、彩燈製作等傳統工藝現場展示，傍晚時分燈光氛圍特別好拍。'},
         {time:'12:00', type:'spot', title:'前往順德大良', tag:'交通',
+          coords:{lat:22.8258,lng:113.2755},
           transport:{mode:'taxi', from:'嶺南天地', min:35, cost:65},
           note:'依路況約 30–40 分鐘車程。'},
         {time:'13:00', type:'spot', title:'清暉園', tag:'景點',
+          coords:{lat:22.8258,lng:113.2755},
           transport:{mode:'walk', from:'', min:0, cost:0},
           note:'順德代表性嶺南園林，與梁園、余蔭山房、可園並稱「嶺南四大名園」，建築與造景精緻，池塘養有錦鯉，古色古香很適合拍照。門票約15元（學生半價），建議停留 1 小時左右，把時間留給後面吃東西。',
           address:'佛山市順德區清暉路23號', phone:'+8675722226196'},
         {time:'14:15', type:'spot', title:'華蓋路步行街', tag:'步行街',
+          coords:{lat:22.8256,lng:113.2764},
           transport:{mode:'walk', from:'清暉園', min:8, cost:0},
           note:'順德的美食＋老街＋小吃＋購物集中地，順德甜品與正餐都在附近解決。必吃：韋記牛雜湯（牛雜四件套：牛雜、蘿蔔、麵筋、豆泡）、阿三麻蓉湯圓（紅豆雙皮奶配糯叽叽湯圓）；街尾的華蓋山棧道可以俯瞰整條街的熱鬧景象，也是熱門拍照點。'},
         {time:'14:30', type:'food', title:'順德甜品：仁信老舖 / 民信老舖', tag:'必吃',
+          coords:{lat:22.8250,lng:113.2760},
           transport:{mode:'walk', from:'華蓋路', min:3, cost:0},
           note:'順德最經典的雙皮奶、薑撞奶、炸牛奶、倫教糕都在這裡，仁信老舖是大良經典甜品站。民信老舖的「原隻椰子燉奶」是招牌創新甜品（在雙皮奶工藝基礎上加入椰皇與水牛奶），3樓還有雙皮奶博物館可以了解製作歷史；金榜街一帶的水牛奶（歡記牛乳、梯底牛乳鋪）也是在地人氣飲品，比一般牛奶濃郁香滑。',
           address:'仁信老舖：佛山市順德區東苑路　／　民信老舖：佛山市順德區東樂路', phone:'-'},
         {time:'16:00', type:'food', title:'順德正餐', tag:'必吃',
+          coords:{lat:22.8250,lng:113.2760},
           transport:{mode:'walk', from:'甜品店', min:5, cost:0},
           note:'必試順德魚生（一魚多吃，野仙魚生開在三百年古宅裡，也可試試「捞德順」）、桑拿雞（蒸煮時間短、肉質Q彈，沾醬油沙薑）、順德燒鵝、太艮堡毋米粥（粥水黏稠卻不見一粒米），順德料理的重點就是「鮮」，敢吃生食的話魚生絕對是必體驗招牌菜。'},
         {time:'18:00', type:'spot', title:'順德漁人碼頭', tag:'夜景／步行街',
+          coords:{lat:22.8020,lng:113.2921},
           transport:{mode:'taxi', from:'順德市區', min:10, cost:15},
           note:'適合拍照、看夜景、吃小吃、喝咖啡，是順德晚上最放鬆的收尾行程。碼頭上有不少明星塗鴉牆與標誌性燈塔可以拍照，小吃攤常見西瓜汁等飲品（約6–8元），傍晚6–7點左右看夕陽是最推薦的時段。',
           address:'佛山市順德區東堤路7號', phone:'-'},
         {time:'20:00', type:'spot', title:'返回民宿', tag:'回程',
+          coords:{lat:23.1291,lng:113.2705},
           transport:{mode:'taxi', from:'漁人碼頭', min:50, cost:110},
           note:'車程約 50 分鐘視路況，回民宿休息。'}
       ]
@@ -532,27 +560,34 @@ const tripData = {
       note:'白馬服裝市場．十三行．一德路．三元里皮具',
       stops:[
         {time:'09:00', type:'shop', title:'白馬服裝市場', tag:'批發市場',
+          coords:{lat:23.1449,lng:113.2626},
           transport:{mode:'taxi', from:'民宿', min:15, cost:20},
           note:'廣州最具代表性的服裝批發市場之一，交易量最大、走中高端路線，營業約 08:00–18:00。樓層攻略：1樓是精品高端女裝，4、5樓款式與質量最好但價位也最高，6樓主要批發男裝；主打大衣、羽絨服、洋裝、針織衫。建議越早去越好逛，議價空間也較大。',
           address:'廣州市越秀區站南路16號', phone:'-'},
         {time:'11:30', type:'shop', title:'十三行批發城', tag:'批發市場',
+          coords:{lat:23.1105,lng:113.2434},
           transport:{mode:'taxi', from:'白馬市場', min:12, cost:16},
           note:'偏向年輕女裝、快時尚、平價款式，是廣州快時尚服飾批發的重要集散地，核心是「新中國大廈」。樓層攻略：2–3樓是核心潮流區，主打原創韓風，中大型批發檔口集中；1樓多是東南亞風與小飾品；營業時間偏早（約7:00–13:00），建議上午前往，通常可談3～5件混批。',
           address:'廣州市荔灣區長堤路購物休閒街興隆北路11號', phone:'-'},
         {time:'13:30', type:'shop', title:'一德路', tag:'批發街',
+          coords:{lat:23.1088,lng:113.2536},
           transport:{mode:'walk', from:'十三行', min:8, cost:0},
           note:'可逛玩具、禮品、飾品、小商品、食品與節慶用品，很有「批發淘寶街」的氛圍，適合買伴手禮小物。這裡是東南亞地區最大的海味乾果批發市場，必買花菇、蟲草花、瑤柱等乾貨，知名店家集中在「山海城」「海中寶」；玩具則以萬菱廣場、一德國際玩具精品廣場、中港玩具精品批發市場最集中。附近的石室聖心大教堂（哥德式紅磚教堂）也很適合順路拍照。'},
         {time:'15:00', type:'shop', title:'三元里／白雲皮具市場', tag:'批發市場',
+          coords:{lat:23.1830,lng:113.2680},
           transport:{mode:'taxi', from:'一德路', min:20, cost:25},
           note:'廣州最重要的皮具、包袋、皮帶採購區，例如廣州白雲世界皮具貿易中心（分一期、二期），是中高檔真皮女包、輕奢款式的集散地。逛法建議：精華檔口多在1–2樓，尤其近大門的區域；建議挑選標示「無 Logo」「原創款」「同款風格」「頭層牛皮」「工廠貨」的商品，品質實在又不涉及仿冒糾紛，銷售假冒註冊商標的商品在中國大陸屬違法行為，務必避免購買。',
           address:'廣州市白雲區（白雲世界皮具貿易中心）', phone:'+862087674536'},
         {time:'18:00', type:'spot', title:'返回民宿', tag:'回程',
+          coords:{lat:23.1291,lng:113.2705},
           transport:{mode:'taxi', from:'三元里', min:25, cost:30},
           note:'先回民宿稍作休息，把戰利品放下，準備吃晚餐。'},
         {time:'19:30', type:'spot', title:'北京路晚餐＋購物', tag:'夜市／步行街',
+          coords:{lat:23.1291,lng:113.2705},
           transport:{mode:'walk', from:'民宿', min:5, cost:0},
           note:'路線建議：北京路 → 惠福東路 → 北京路夜市 → 吾悅廣場。晚餐可吃牛雜、雲吞麵、炒河粉、煲仔飯、糖水、雙皮奶。'},
         {time:'21:00', type:'spot', title:'返回民宿', tag:'回程',
+          coords:{lat:23.1291,lng:113.2705},
           transport:{mode:'walk', from:'北京路', min:5, cost:0},
           note:'逛街購物後步行回吾悅廣場民宿休息，明天是最後一天，記得把行李收好。'}
       ]
@@ -562,19 +597,24 @@ const tripData = {
       note:'退房．廣州塔．前往南沙港．搭船返港轉機',
       stops:[
         {time:'08:30', type:'spot', title:'民宿退房', tag:'交通',
+          coords:{lat:23.1291,lng:113.2705},
           transport:{mode:'walk', from:'', min:0, cost:0},
           note:'回程船班 15:50 從南沙港客運碼頭開航，建議提前2小時（13:50前）抵達碼頭辦理登船／出境手續，今天時間比較緊湊，行李請提前收拾好。'},
         {time:'09:00', type:'spot', title:'前往廣州塔', tag:'交通',
+          coords:{lat:23.1066,lng:113.3246},
           transport:{mode:'taxi', from:'民宿', min:20, cost:25},
           note:'廣州塔位於海珠區，方向上比市區更靠近南沙，安排在回程路上順遊，比昨天才特地跑一趟更省時間。'},
         {time:'09:30', type:'spot', title:'廣州塔（快閃參觀）', tag:'必去地標',
+          coords:{lat:23.1066,lng:113.3246},
           transport:{mode:'walk', from:'', min:0, cost:0},
           note:'俗稱「小蠻腰」，廣州新地標，塔身主體450米。今天時間有限，建議直接登塔看白天景觀即可（488米戶外觀景平台，360度俯瞰全城），摩天輪夜景與太古匯商場這次時間不夠，只能割愛留待下次造訪。安排 1–1.5 小時，注意保留足夠時間前往南沙港。',
           address:'廣州市海珠區閱江西路', phone:'+862089338222'},
         {time:'11:00', type:'spot', title:'前往南沙港客運碼頭', tag:'交通',
+          coords:{lat:22.7157,lng:113.5266},
           transport:{mode:'taxi', from:'廣州塔', min:65, cost:130},
           note:'車程依路況約 60–70 分鐘，這是預估值，建議出發前用地圖 App 查詢即時路況，務必抓寬裕一點，確保能在 13:50 前抵達碼頭。'},
         {time:'12:30', type:'spot', title:'抵達南沙港，辦理登船手續', tag:'交通',
+          coords:{lat:22.7157,lng:113.5266},
           transport:{mode:'walk', from:'', min:0, cost:0},
           note:'預留約1.5–2小時辦理登船、出境安檢等手續，13:50前完成即符合建議的2小時緩衝。'},
         {time:'15:50', type:'spot', title:'南沙港開航前往香港', tag:'交通',
@@ -600,6 +640,7 @@ const tripData = {
     {cat:'藥品', items:['個人常備藥','腸胃藥','OK繃／小藥膏']}
   ]
 };
+let tripData = JSON.parse(JSON.stringify(defaultTripData));
 
 const flightData = {
   outbound:{
@@ -748,6 +789,7 @@ function render(){
         <div class="divider"></div>
         <div class="item cost"><div class="label">交通花費</div><div class="value" data-sum-cost>¥0</div></div>
       </div>
+      <button class="recalc-btn" data-recalc-day="${day.id}">🧮 自動估算本日交通時間／金額（依直線距離概估）</button>
       ${idx===1?`<div class="callout"><b>小提醒：</b>批發市場很容易逛到失控，建議帶一個摺疊購物袋，並在「行李清單」分頁記下每樣戰利品的價格與購買地，才不會回頭找不到。市場內請認明「無 Logo／原創款」商品，避免購買仿冒品牌，逛起來更安心。</div>`:''}
       <div class="timeline" data-day="${day.id}"></div>
       <button class="add-stop-btn" data-day="${day.id}">＋ 新增一個行程</button>
@@ -756,6 +798,13 @@ function render(){
 
     const timeline = panel.querySelector('.timeline');
     day.stops.forEach((stop, sIdx)=> timeline.appendChild(renderStop(day, stop, sIdx)));
+    const dayTitleEl = panel.querySelector('h2[data-field="title"]');
+    const dayNoteEl = panel.querySelector('.day-note[data-field="note"]');
+    if(dayTitleEl) dayTitleEl.addEventListener('blur', ()=>{ day.title = dayTitleEl.innerText; pushTripData(); });
+    if(dayNoteEl) dayNoteEl.addEventListener('blur', ()=>{
+      day.note = dayNoteEl.innerText.replace(/^📅[^\　]*　/,'');
+      pushTripData();
+    });
   });
 
   // packing tab
@@ -816,6 +865,33 @@ function render(){
       const timeline = document.querySelector(`.timeline[data-day="${dayId}"]`);
       timeline.appendChild(renderStop(day, newStop, day.stops.length-1));
       updateSummary(dayId);
+      pushTripData();
+    };
+  });
+
+  // 自動估算交通時間／金額
+  document.querySelectorAll('[data-recalc-day]').forEach(btn=>{
+    btn.onclick=()=>{
+      if(!requireUnlock()) return;
+      const dayId = btn.dataset.recalcDay;
+      const day = tripData.days.find(d=>d.id===dayId);
+      if(!day) return;
+      const result = recalcDayTransport(day);
+      // 依目前渲染順序，把新的時間／金額寫回畫面上的輸入框
+      const timeline = document.querySelector(`.timeline[data-day="${dayId}"]`);
+      const minInputs = timeline.querySelectorAll('[data-role="min"]');
+      const costInputs = timeline.querySelectorAll('[data-role="cost"]');
+      day.stops.forEach((stop, i)=>{
+        if(minInputs[i]) minInputs[i].value = stop.transport.min;
+        if(costInputs[i]) costInputs[i].value = stop.transport.cost;
+      });
+      updateSummary(dayId);
+      pushTripData();
+      if(result.skipped>0){
+        alert(`已估算 ${result.updated} 段交通！有 ${result.skipped} 段沒有座標資料（例如手動新增的行程），無法自動估算，數字維持原樣，需要的話可以手動輸入。`);
+      } else {
+        alert(`已依直線距離重新估算 ${result.updated} 段交通時間與金額！僅供參考，出發前建議再用地圖 App 確認實際路況。`);
+      }
     };
   });
 }
@@ -847,6 +923,8 @@ function renderStop(day, stop, idx){
   const costInput = tRow.querySelector('[data-role="cost"]');
   minInput.oninput=()=>{ stop.transport.min = Number(minInput.value)||0; updateSummary(day.id); };
   costInput.oninput=()=>{ stop.transport.cost = Number(costInput.value)||0; updateSummary(day.id); };
+  minInput.addEventListener('blur', ()=> pushTripData());
+  costInput.addEventListener('blur', ()=> pushTripData());
   wrap.appendChild(tRow);
 
   const card = document.createElement('div');
@@ -874,8 +952,8 @@ function renderStop(day, stop, idx){
     if(document.body.classList.contains('editing') && e.target.closest('[contenteditable]')) return;
     card.classList.toggle('open');
   };
-  card.querySelector('.stop-title').addEventListener('blur', ()=>{ stop.title = card.querySelector('.stop-title').innerText; });
-  card.querySelector('[data-field="note"]').addEventListener('blur', ()=>{ stop.note = card.querySelector('[data-field="note"]').innerText; });
+  card.querySelector('.stop-title').addEventListener('blur', ()=>{ stop.title = card.querySelector('.stop-title').innerText; pushTripData(); });
+  card.querySelector('[data-field="note"]').addEventListener('blur', ()=>{ stop.note = card.querySelector('[data-field="note"]').innerText; pushTripData(); });
   card.querySelector('.del-stop').onclick=(e)=>{
     e.stopPropagation();
     if(!confirm('確定要刪除這個行程嗎？')) return;
@@ -883,9 +961,64 @@ function renderStop(day, stop, idx){
     if(i>-1) day.stops.splice(i,1);
     wrap.remove();
     updateSummary(day.id);
+    pushTripData();
   };
   wrap.appendChild(card);
   return wrap;
+}
+
+const HOSTEL_COORDS = {lat:23.1291, lng:113.2705};
+
+function haversineKm(a, b){
+  if(!a || !b) return null;
+  const R = 6371;
+  const dLat = (b.lat-a.lat)*Math.PI/180;
+  const dLng = (b.lng-a.lng)*Math.PI/180;
+  const lat1 = a.lat*Math.PI/180, lat2 = b.lat*Math.PI/180;
+  const h = Math.sin(dLat/2)**2 + Math.cos(lat1)*Math.cos(lat2)*Math.sin(dLng/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(h), Math.sqrt(1-h));
+}
+
+// 依直線距離 × 繞路係數，概估車程時間與車資（僅供參考，非實際路況）
+function estimateTransport(mode, straightKm){
+  const roadKm = straightKm * 1.35; // 市區道路繞行概估係數
+  if(mode==='walk'){
+    return { min: Math.max(3, Math.round(roadKm/4.5*60)), cost: 0 };
+  }
+  if(mode==='metro'){
+    const min = Math.max(8, Math.round(roadKm/32*60) + 8);
+    let cost = 3;
+    if(roadKm>4) cost += Math.ceil((roadKm-4)/4);
+    return { min, cost: Math.min(cost, 12) };
+  }
+  // taxi：距離越遠，多半會走快速路/高速，平均車速跟著提高
+  let speed = 20;
+  if(roadKm>15) speed = 55;
+  else if(roadKm>6) speed = 32;
+  const min = Math.max(5, Math.round(roadKm/speed*60) + 4);
+  const cost = Math.round(12 + roadKm*2.6);
+  return { min, cost };
+}
+
+function recalcDayTransport(day){
+  let prevCoords = HOSTEL_COORDS;
+  let updated = 0, skipped = 0;
+  day.stops.forEach(stop=>{
+    const toCoords = stop.coords;
+    if(stop.transport && stop.transport.mode!=='drive' && toCoords && prevCoords && stop.transport.from){
+      const km = haversineKm(prevCoords, toCoords);
+      if(km!=null){
+        const est = estimateTransport(stop.transport.mode, km);
+        stop.transport.min = est.min;
+        stop.transport.cost = est.cost;
+        updated++;
+      }
+    } else if(stop.transport && stop.transport.from){
+      skipped++;
+    }
+    if(toCoords) prevCoords = toCoords;
+  });
+  return { updated, skipped };
 }
 
 function updateSummary(dayId){
@@ -909,6 +1042,8 @@ function switchPanel(id){
 /* ---------------- Edit mode ---------------- */
 const fab = document.getElementById('fab');
 fab.onclick=()=>{
+  const turningOn = !document.body.classList.contains('editing');
+  if(turningOn && !requireUnlock()) return;
   const on = document.body.classList.toggle('editing');
   fab.classList.toggle('on', on);
   fab.textContent = on? '✓' : '✎';
@@ -951,19 +1086,39 @@ const firebaseConfig = {
 };
 
 let splitRef = null;
+let tripRef = null;
 let firebaseReady = false;
+let tripFirebaseReady = false;
 let suppressNextRemoteEcho = false;
+
+/* ---------------- 編輯密碼鎖 ---------------- */
+const EDIT_PASSWORD = '0924';
+let editUnlocked = (localStorage.getItem('editUnlocked')==='1');
+
+function requireUnlock(){
+  if(editUnlocked) return true;
+  const pw = prompt('這個操作需要輸入編輯密碼才能繼續：');
+  if(pw===null) return false;
+  if(pw===EDIT_PASSWORD){
+    editUnlocked = true;
+    localStorage.setItem('editUnlocked','1');
+    return true;
+  }
+  alert('密碼不正確');
+  return false;
+}
 
 function initFirebaseSync(){
   try{
     if(typeof firebase === 'undefined'){
-      console.warn('Firebase SDK 未載入，分帳資料僅會保存在本機瀏覽器');
+      console.warn('Firebase SDK 未載入，資料僅會保存在本機瀏覽器');
       updateSyncBadge('offline');
       return;
     }
     const app = firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
     splitRef = db.ref('splitData');
+    tripRef = db.ref('tripData');
 
     // 若 5 秒內都沒有連線回應（例如網路被擋、file:// 開啟受限），顯示離線狀態
     const connectTimeout = setTimeout(()=>{
@@ -992,8 +1147,25 @@ function initFirebaseSync(){
       console.warn('Firebase 讀取失敗', err);
       updateSyncBadge('offline');
     });
+
+    tripRef.on('value', (snap)=>{
+      const val = snap.val();
+      const activeId = document.querySelector('.tab.active') ? document.querySelector('.tab.active').dataset.target : null;
+      if(val && val.days){
+        tripData = val;
+      } else {
+        tripData = JSON.parse(JSON.stringify(defaultTripData));
+        tripRef.set(tripData);
+      }
+      tripFirebaseReady = true;
+      render();
+      bindFlightInputs();
+      if(activeId) switchPanel(activeId);
+    }, (err)=>{
+      console.warn('行程資料讀取失敗', err);
+    });
   }catch(e){
-    console.warn('Firebase 初始化失敗，分帳資料僅會保存在本機瀏覽器', e);
+    console.warn('Firebase 初始化失敗，資料僅會保存在本機瀏覽器', e);
     updateSyncBadge('offline');
   }
 }
@@ -1002,6 +1174,12 @@ function pushSplitData(){
   if(splitRef){
     updateSyncBadge('syncing');
     splitRef.set(splitData).then(()=> updateSyncBadge('synced')).catch(()=> updateSyncBadge('offline'));
+  }
+}
+
+function pushTripData(){
+  if(tripRef){
+    tripRef.set(tripData);
   }
 }
 
@@ -1288,6 +1466,7 @@ function refreshSplitPanel(){
   // 事件綁定
   panel.querySelectorAll('[data-remove-member]').forEach(btn=>{
     btn.onclick=()=>{
+      if(!requireUnlock()) return;
       const name = btn.dataset.removeMember;
       if(splitData.members.length<=1){ alert('至少要保留一位成員喔'); return; }
       const involved = splitData.expenses.some(e=> e.paidBy===name || e.splitAmong.includes(name));
@@ -1303,6 +1482,7 @@ function refreshSplitPanel(){
   });
 
   panel.querySelector('#addMemberBtn').onclick=()=>{
+    if(!requireUnlock()) return;
     const input = panel.querySelector('#newMemberInput');
     const name = input.value.trim();
     if(name==='') return;
@@ -1319,6 +1499,7 @@ function refreshSplitPanel(){
 
   panel.querySelectorAll('[data-deposit-member]').forEach(inp=>{
     inp.addEventListener('change', ()=>{
+      if(!requireUnlock()){ inp.value = splitData.deposits[inp.dataset.depositMember]||0; return; }
       splitData.deposits[inp.dataset.depositMember] = Number(inp.value)||0;
       pushSplitData();
       refreshSplitPanel();
@@ -1327,6 +1508,7 @@ function refreshSplitPanel(){
 
   panel.querySelectorAll('[data-head-member]').forEach(inp=>{
     inp.addEventListener('change', ()=>{
+      if(!requireUnlock()){ inp.value = splitData.headcount[inp.dataset.headMember]||1; return; }
       splitData.headcount[inp.dataset.headMember] = Math.max(1, Number(inp.value)||1);
       pushSplitData();
       refreshSplitPanel();
@@ -1338,6 +1520,7 @@ function refreshSplitPanel(){
   };
 
   panel.querySelector('#addExpenseBtn').onclick=()=>{
+    if(!requireUnlock()) return;
     const category = panel.querySelector('#expCategory').value;
     const date = panel.querySelector('#expDate').value || splitData.lastDate;
     const desc = panel.querySelector('#expDesc').value.trim();
@@ -1355,6 +1538,7 @@ function refreshSplitPanel(){
 
   panel.querySelectorAll('[data-del-exp]').forEach(btn=>{
     btn.onclick=()=>{
+      if(!requireUnlock()) return;
       const id = btn.dataset.delExp;
       if(!confirm('確定要刪除這筆花費嗎？')) return;
       splitData.expenses = splitData.expenses.filter(e=>String(e.id)!==String(id));
@@ -1366,6 +1550,7 @@ function refreshSplitPanel(){
 
   panel.querySelectorAll('[data-edit-exp]').forEach(btn=>{
     btn.onclick=()=>{
+      if(!requireUnlock()) return;
       editingExpenseId = btn.dataset.editExp;
       refreshSplitPanel();
     };
