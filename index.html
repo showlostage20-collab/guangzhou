@@ -1192,6 +1192,8 @@ function initFirebaseSync(){
       render();
       bindFlightInputs();
       if(activeId) switchPanel(activeId);
+      // render() 會重建整個畫面（含分帳分頁的同步徽章），套用目前已知的連線狀態，避免徽章被重置回「連線中」
+      updateSyncBadge(firebaseReady ? 'synced' : 'syncing');
     }, (err)=>{
       console.warn('行程資料讀取失敗', err);
     });
