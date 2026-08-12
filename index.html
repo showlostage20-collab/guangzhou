@@ -104,7 +104,6 @@
     align-items:center; gap:3px; margin-left:6px;
   }
   body.editing .field-edit-btn{display:inline-flex;}
-  [contenteditable="true"].field-active{outline:2px solid var(--gold); background:rgba(216,155,46,0.10); border-radius:4px;}
 
   /* Summary card */
   .summary{
@@ -236,8 +235,6 @@
   }
   .contact-row a.tel{color:var(--red-deep);}
   .contact-row a.gaode{color:var(--jade); border-color:rgba(31,122,92,0.35); background:rgba(31,122,92,0.08);}
-
-  [contenteditable="true"]{outline:none; border-bottom:1.5px dashed var(--gold); background:rgba(216,155,46,0.06); border-radius:3px; padding:0 2px;}
 
   .del-stop{
     display:none; margin-top:10px; font-size:11.5px; color:var(--red-deep); background:none; border:1px solid var(--red-deep);
@@ -427,7 +424,7 @@
 </div>
 
 <div class="tabbar" id="tabbar"></div>
-<div class="edit-banner">✏️ 編輯模式已開啟：點文字旁的「✎」小按鈕才能修改該欄位，避免誤觸；也可用下方按鈕新增／刪除行程</div>
+<div class="edit-banner">✏️ 編輯模式已開啟：點文字旁的「✎」按鈕會跳出視窗讓你輸入新內容，不會直接在頁面上出現編輯游標；也可用下方按鈕新增／刪除行程</div>
 
 <div id="panels"></div>
 
@@ -787,10 +784,10 @@ function render(){
     panel.innerHTML = `
       <div class="day-title">
         <div>
-          <span><h2 contenteditable="false" data-field="title" data-field-target="dayTitle-${day.id}" style="display:inline;">${day.title}</h2><button type="button" class="field-edit-btn" data-open-field="dayTitle-${day.id}">✎ 編輯標題</button></span>
+          <span><h2 id="dayTitleText-${day.id}">${day.title}</h2><button type="button" class="field-edit-btn" data-edit-day-title="${day.id}">✎ 編輯標題</button></span>
           <div style="display:flex; align-items:flex-start; gap:2px;">
-            <div class="day-note" contenteditable="false" data-field="note" data-field-target="dayNote-${day.id}">${day.date? '📅 '+day.date+'　':''}${day.note}</div>
-            <button type="button" class="field-edit-btn" data-open-field="dayNote-${day.id}">✎ 編輯說明</button>
+            <div class="day-note">${day.date? `<span>📅 ${day.date}　</span>`:''}<span id="dayNoteText-${day.id}">${day.note}</span></div>
+            <button type="button" class="field-edit-btn" data-edit-day-note="${day.id}">✎ 編輯說明</button>
           </div>
         </div>
       </div>
@@ -808,14 +805,22 @@ function render(){
 
     const timeline = panel.querySelector('.timeline');
     day.stops.forEach((stop, sIdx)=> timeline.appendChild(renderStop(day, stop, sIdx)));
-    const dayTitleEl = panel.querySelector('h2[data-field="title"]');
-    const dayNoteEl = panel.querySelector('.day-note[data-field="note"]');
-    if(dayTitleEl) dayTitleEl.addEventListener('blur', ()=>{ day.title = dayTitleEl.innerText; deactivateField(dayTitleEl); pushTripData(); });
-    if(dayNoteEl) dayNoteEl.addEventListener('blur', ()=>{
-      day.note = dayNoteEl.innerText.replace(/^📅[^\　]*　/,'');
-      deactivateField(dayNoteEl);
+    const dayTitleBtn = panel.querySelector(`[data-edit-day-title="${day.id}"]`);
+    const dayNoteBtn = panel.querySelector(`[data-edit-day-note="${day.id}"]`);
+    if(dayTitleBtn) dayTitleBtn.onclick = ()=>{
+      const val = prompt('編輯這天的標題：', day.title);
+      if(val===null || val.trim()==='') return;
+      day.title = val.trim();
+      document.getElementById(`dayTitleText-${day.id}`).textContent = day.title;
       pushTripData();
-    });
+    };
+    if(dayNoteBtn) dayNoteBtn.onclick = ()=>{
+      const val = prompt('編輯這天的說明：', day.note);
+      if(val===null) return;
+      day.note = val;
+      document.getElementById(`dayNoteText-${day.id}`).textContent = day.note;
+      pushTripData();
+    };
   });
 
   // packing tab
@@ -945,13 +950,13 @@ function renderStop(day, stop, idx){
     <div class="stop-head">
       <div class="stop-time">${stop.time}</div>
       <div class="stop-tag">${stop.tag}</div>
-      <div class="stop-title" contenteditable="false" data-field="title" data-field-target="stopTitle-${fieldKey}">${stop.title}</div>
-      <button type="button" class="field-edit-btn" data-open-field="stopTitle-${fieldKey}">✎</button>
+      <div class="stop-title" id="stopTitleText-${fieldKey}">${stop.title}</div>
+      <button type="button" class="field-edit-btn" data-edit-stop-title="${fieldKey}">✎</button>
       <div class="stop-arrow">▶</div>
     </div>
     <div class="stop-body">
-      <div class="note-label">簡介／備註　<button type="button" class="field-edit-btn" data-open-field="stopNote-${fieldKey}">✎ 編輯備註</button></div>
-      <div contenteditable="false" data-field="note" data-field-target="stopNote-${fieldKey}">${stop.note||''}</div>
+      <div class="note-label">簡介／備註　<button type="button" class="field-edit-btn" data-edit-stop-note="${fieldKey}">✎ 編輯備註</button></div>
+      <div id="stopNoteText-${fieldKey}">${stop.note||''}</div>
       <div class="contact-row">
         <a class="gaode" target="_blank" href="https://uri.amap.com/search?keyword=${encodeURIComponent(stop.address||stop.title)}">🗺️ 高德地圖</a>
         ${stop.address?`<a class="addr" target="_blank" href="https://www.google.com/maps/search/${encodeURIComponent(stop.address)}">📍 ${stop.address}</a>`:''}
@@ -962,13 +967,25 @@ function renderStop(day, stop, idx){
   `;
   const head = card.querySelector('.stop-head');
   head.onclick=(e)=>{
-    if(e.target.closest('[contenteditable="true"]') || e.target.closest('.field-edit-btn')) return;
+    if(e.target.closest('.field-edit-btn')) return;
     card.classList.toggle('open');
   };
-  const stopTitleEl = card.querySelector('.stop-title');
-  const stopNoteEl = card.querySelector('[data-field="note"]');
-  stopTitleEl.addEventListener('blur', ()=>{ stop.title = stopTitleEl.innerText; deactivateField(stopTitleEl); pushTripData(); });
-  stopNoteEl.addEventListener('blur', ()=>{ stop.note = stopNoteEl.innerText; deactivateField(stopNoteEl); pushTripData(); });
+  card.querySelector(`[data-edit-stop-title="${fieldKey}"]`).onclick=(e)=>{
+    e.stopPropagation();
+    const val = prompt('編輯行程標題：', stop.title);
+    if(val===null || val.trim()==='') return;
+    stop.title = val.trim();
+    document.getElementById(`stopTitleText-${fieldKey}`).textContent = stop.title;
+    pushTripData();
+  };
+  card.querySelector(`[data-edit-stop-note="${fieldKey}"]`).onclick=(e)=>{
+    e.stopPropagation();
+    const val = prompt('編輯簡介／備註：', stop.note||'');
+    if(val===null) return;
+    stop.note = val;
+    document.getElementById(`stopNoteText-${fieldKey}`).textContent = stop.note;
+    pushTripData();
+  };
   card.querySelector('.del-stop').onclick=(e)=>{
     e.stopPropagation();
     if(!confirm('確定要刪除這個行程嗎？')) return;
@@ -1055,30 +1072,6 @@ function switchPanel(id){
 }
 
 /* ---------------- Edit mode ---------------- */
-function activateField(key){
-  const el = document.querySelector(`[data-field-target="${key}"]`);
-  if(!el) return;
-  el.setAttribute('contenteditable', 'true');
-  el.classList.add('field-active');
-  el.focus();
-  const range = document.createRange();
-  range.selectNodeContents(el);
-  range.collapse(false);
-  const sel = window.getSelection();
-  sel.removeAllRanges();
-  sel.addRange(range);
-}
-function deactivateField(el){
-  if(!el) return;
-  el.setAttribute('contenteditable', 'false');
-  el.classList.remove('field-active');
-}
-
-document.addEventListener('click', (e)=>{
-  const btn = e.target.closest('[data-open-field]');
-  if(btn){ activateField(btn.dataset.openField); }
-});
-
 const fab = document.getElementById('fab');
 fab.onclick=()=>{
   const turningOn = !document.body.classList.contains('editing');
@@ -1086,10 +1079,6 @@ fab.onclick=()=>{
   const on = document.body.classList.toggle('editing');
   fab.classList.toggle('on', on);
   fab.textContent = on? '✓' : '✎';
-  if(!on){
-    // 關閉編輯模式時，把還在編輯中的欄位收起來
-    document.querySelectorAll('.field-active').forEach(el=> deactivateField(el));
-  }
 };
 
 /* ---------------- 分帳記帳 ---------------- */
