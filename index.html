@@ -1137,7 +1137,11 @@ let suppressNextRemoteEcho = false;
 
 /* ---------------- 編輯密碼鎖 ---------------- */
 const EDIT_PASSWORD = '0924';
-let editUnlocked = (localStorage.getItem('editUnlocked')==='1');
+const UNLOCK_DURATION_MS = 24 * 60 * 60 * 1000; // 24小時後需要重新輸入密碼
+let editUnlocked = (function(){
+  const unlockedAt = Number(localStorage.getItem('editUnlockedAt') || 0);
+  return unlockedAt > 0 && (Date.now() - unlockedAt) < UNLOCK_DURATION_MS;
+})();
 
 function requireUnlock(){
   if(editUnlocked) return true;
@@ -1145,7 +1149,7 @@ function requireUnlock(){
   if(pw===null) return false;
   if(pw===EDIT_PASSWORD){
     editUnlocked = true;
-    localStorage.setItem('editUnlocked','1');
+    localStorage.setItem('editUnlockedAt', Date.now().toString());
     return true;
   }
   alert('密碼不正確');
