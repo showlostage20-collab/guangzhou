@@ -441,6 +441,7 @@
 <script>
 /* ---------------- 資料 ---------------- */
 const defaultTripData = {
+  contentVersion: 2,
   days: [
     {
       id:'d0', num:'壹', label:'DAY 1', date:'09/24', title:'抵達廣州　入境轉移',
@@ -1204,9 +1205,11 @@ function initFirebaseSync(){
     tripRef.on('value', (snap)=>{
       const val = snap.val();
       const activeId = document.querySelector('.tab.active') ? document.querySelector('.tab.active').dataset.target : null;
-      if(val && val.days){
+      const remoteVersion = (val && val.contentVersion) || 0;
+      if(val && val.days && remoteVersion >= defaultTripData.contentVersion){
         tripData = val;
       } else {
+        // 資料庫沒有資料，或程式碼有較新的行程內容更新，改用最新版本並覆蓋回雲端
         tripData = JSON.parse(JSON.stringify(defaultTripData));
         tripRef.set(tripData);
       }
