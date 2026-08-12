@@ -177,6 +177,12 @@
   }
   .flight-grid input:focus{outline:none; border-color:var(--gold);}
   .flight-grid input::placeholder{color:#b6b6ba; font-size:11.5px;}
+  .flight-grid input:disabled, .flight-route input:disabled, .leg-route input:disabled, .transfer-note input:disabled{
+    opacity:1; -webkit-text-fill-color:var(--ink); color:var(--ink); cursor:default; background:var(--paper2);
+  }
+  body.editing .flight-grid input:not(:disabled), body.editing .flight-route input:not(:disabled), body.editing .leg-route input:not(:disabled){
+    border-color:var(--gold); background:#FFFDF7;
+  }
   @media (max-width:360px){
     .flight-grid{grid-template-columns:1fr;}
     .flight-grid .field{grid-column:1 / -1;}
@@ -682,29 +688,29 @@ function renderFlightCard(key, label, cls){
       <div class="leg">
         <div class="leg-type-tag">${legIcon(leg.type)} ${legTypeLabel(leg.type)}</div>
         <div class="leg-route">
-          <input class="city" data-flight="${key}" data-leg="${i}" data-legfield="from" value="${leg.from}">
+          <input class="city" disabled data-flight="${key}" data-leg="${i}" data-legfield="from" value="${leg.from}">
           <span class="arrow">→</span>
-          <input class="city" data-flight="${key}" data-leg="${i}" data-legfield="to" value="${leg.to}">
+          <input class="city" disabled data-flight="${key}" data-leg="${i}" data-legfield="to" value="${leg.to}">
         </div>
         <div class="flight-grid">
           <div class="field">
             <label>出發時間</label>
-            <input type="time" data-flight="${key}" data-leg="${i}" data-legfield="depTime" value="${leg.depTime}">
+            <input type="time" disabled data-flight="${key}" data-leg="${i}" data-legfield="depTime" value="${leg.depTime}">
           </div>
           <div class="field">
             <label>抵達時間</label>
-            <input type="time" data-flight="${key}" data-leg="${i}" data-legfield="arrTime" value="${leg.arrTime}">
+            <input type="time" disabled data-flight="${key}" data-leg="${i}" data-legfield="arrTime" value="${leg.arrTime}">
           </div>
           <div class="field full">
             <label>航空公司／航班號</label>
-            <input type="text" data-flight="${key}" data-leg="${i}" data-legfield="flight" placeholder="尚未確定，訂票後再填入" value="${leg.flight}">
+            <input type="text" disabled data-flight="${key}" data-leg="${i}" data-legfield="flight" placeholder="尚未確定，訂票後再填入" value="${leg.flight}">
           </div>
         </div>
       </div>`;
     const transferBlock = (i < f.legs.length-1) ? `
       <div class="transfer-note">
         <span>${legIcon(leg.type)}→${legIcon(f.legs[i+1].type)}</span>
-        <input type="text" data-flight="${key}" data-transfer="${i}" value="${f.transfers[i]||''}">
+        <input type="text" disabled data-flight="${key}" data-transfer="${i}" value="${f.transfers[i]||''}">
       </div>` : '';
     return legBlock + transferBlock;
   }).join('');
@@ -721,12 +727,17 @@ function renderFlightCard(key, label, cls){
       <div class="flight-grid" style="margin-bottom:12px;">
         <div class="field full">
           <label>日期</label>
-          <input type="date" data-flight="${key}" data-field="date" value="${f.date}">
+          <input type="date" disabled data-flight="${key}" data-field="date" value="${f.date}">
         </div>
       </div>
       ${legsHtml}
     </div>
   `;
+}
+
+function applyFlightInputsLock(){
+  const editing = document.body.classList.contains('editing');
+  document.querySelectorAll('#panel-flight input').forEach(el=> el.disabled = !editing);
 }
 
 function bindFlightInputs(){
@@ -742,6 +753,7 @@ function bindFlightInputs(){
       }
     });
   });
+  applyFlightInputsLock();
 }
 
 /* ---------------- Render ---------------- */
@@ -764,7 +776,7 @@ function render(){
   flightPanel.className='panel active';
   flightPanel.id='panel-flight';
   flightPanel.innerHTML = `
-    <div class="day-title"><div><h2>航班資訊</h2><div class="day-note">去程／回程皆為台北－香港轉機，內容可點擊修改</div></div></div>
+    <div class="day-title"><div><h2>航班資訊</h2><div class="day-note">去程／回程皆為台北－香港轉機。內容已鎖定，需點右下角✎進入編輯模式（需密碼）才能修改</div></div></div>
     ${renderFlightCard('outbound','去程','outbound')}
     ${renderFlightCard('inbound','回程','inbound')}
   `;
@@ -1079,6 +1091,7 @@ fab.onclick=()=>{
   const on = document.body.classList.toggle('editing');
   fab.classList.toggle('on', on);
   fab.textContent = on? '✓' : '✎';
+  applyFlightInputsLock();
 };
 
 /* ---------------- 分帳記帳 ---------------- */
