@@ -98,6 +98,13 @@
   .day-title{display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-bottom:4px;}
   .day-title h2{font-size:20px; font-weight:900;}
   .day-title .day-note{font-size:12.5px; color:#6b6b72; margin-top:2px;}
+  .field-edit-btn{
+    display:none; flex:0 0 auto; border:1.5px solid var(--gold); background:#FFF7E8; color:#8a611b;
+    border-radius:20px; font-size:10.5px; font-weight:700; padding:2px 8px; cursor:pointer; font-family:inherit;
+    align-items:center; gap:3px; margin-left:6px;
+  }
+  body.editing .field-edit-btn{display:inline-flex;}
+  [contenteditable="true"].field-active{outline:2px solid var(--gold); background:rgba(216,155,46,0.10); border-radius:4px;}
 
   /* Summary card */
   .summary{
@@ -420,7 +427,7 @@
 </div>
 
 <div class="tabbar" id="tabbar"></div>
-<div class="edit-banner">✏️ 編輯模式已開啟：可直接點文字修改內容，或用下方按鈕新增／刪除行程</div>
+<div class="edit-banner">✏️ 編輯模式已開啟：點文字旁的「✎」小按鈕才能修改該欄位，避免誤觸；也可用下方按鈕新增／刪除行程</div>
 
 <div id="panels"></div>
 
@@ -780,8 +787,11 @@ function render(){
     panel.innerHTML = `
       <div class="day-title">
         <div>
-          <h2 contenteditable="false" data-field="title">${day.title}</h2>
-          <div class="day-note" contenteditable="false" data-field="note">${day.date? '📅 '+day.date+'　':''}${day.note}</div>
+          <span><h2 contenteditable="false" data-field="title" data-field-target="dayTitle-${day.id}" style="display:inline;">${day.title}</h2><button type="button" class="field-edit-btn" data-open-field="dayTitle-${day.id}">✎ 編輯標題</button></span>
+          <div style="display:flex; align-items:flex-start; gap:2px;">
+            <div class="day-note" contenteditable="false" data-field="note" data-field-target="dayNote-${day.id}">${day.date? '📅 '+day.date+'　':''}${day.note}</div>
+            <button type="button" class="field-edit-btn" data-open-field="dayNote-${day.id}">✎ 編輯說明</button>
+          </div>
         </div>
       </div>
       <div class="summary" data-summary="${day.id}">
@@ -800,9 +810,10 @@ function render(){
     day.stops.forEach((stop, sIdx)=> timeline.appendChild(renderStop(day, stop, sIdx)));
     const dayTitleEl = panel.querySelector('h2[data-field="title"]');
     const dayNoteEl = panel.querySelector('.day-note[data-field="note"]');
-    if(dayTitleEl) dayTitleEl.addEventListener('blur', ()=>{ day.title = dayTitleEl.innerText; pushTripData(); });
+    if(dayTitleEl) dayTitleEl.addEventListener('blur', ()=>{ day.title = dayTitleEl.innerText; deactivateField(dayTitleEl); pushTripData(); });
     if(dayNoteEl) dayNoteEl.addEventListener('blur', ()=>{
       day.note = dayNoteEl.innerText.replace(/^📅[^\　]*　/,'');
+      deactivateField(dayNoteEl);
       pushTripData();
     });
   });
@@ -929,16 +940,18 @@ function renderStop(day, stop, idx){
 
   const card = document.createElement('div');
   card.className = 'stop type-'+stop.type;
+  const fieldKey = day.id + '-' + idx;
   card.innerHTML = `
     <div class="stop-head">
       <div class="stop-time">${stop.time}</div>
       <div class="stop-tag">${stop.tag}</div>
-      <div class="stop-title" contenteditable="false" data-field="title">${stop.title}</div>
+      <div class="stop-title" contenteditable="false" data-field="title" data-field-target="stopTitle-${fieldKey}">${stop.title}</div>
+      <button type="button" class="field-edit-btn" data-open-field="stopTitle-${fieldKey}">✎</button>
       <div class="stop-arrow">▶</div>
     </div>
     <div class="stop-body">
-      <div class="note-label">簡介／備註</div>
-      <div contenteditable="false" data-field="note">${stop.note||''}</div>
+      <div class="note-label">簡介／備註　<button type="button" class="field-edit-btn" data-open-field="stopNote-${fieldKey}">✎ 編輯備註</button></div>
+      <div contenteditable="false" data-field="note" data-field-target="stopNote-${fieldKey}">${stop.note||''}</div>
       <div class="contact-row">
         <a class="gaode" target="_blank" href="https://uri.amap.com/search?keyword=${encodeURIComponent(stop.address||stop.title)}">🗺️ 高德地圖</a>
         ${stop.address?`<a class="addr" target="_blank" href="https://www.google.com/maps/search/${encodeURIComponent(stop.address)}">📍 ${stop.address}</a>`:''}
@@ -949,11 +962,13 @@ function renderStop(day, stop, idx){
   `;
   const head = card.querySelector('.stop-head');
   head.onclick=(e)=>{
-    if(document.body.classList.contains('editing') && e.target.closest('[contenteditable]')) return;
+    if(e.target.closest('[contenteditable="true"]') || e.target.closest('.field-edit-btn')) return;
     card.classList.toggle('open');
   };
-  card.querySelector('.stop-title').addEventListener('blur', ()=>{ stop.title = card.querySelector('.stop-title').innerText; pushTripData(); });
-  card.querySelector('[data-field="note"]').addEventListener('blur', ()=>{ stop.note = card.querySelector('[data-field="note"]').innerText; pushTripData(); });
+  const stopTitleEl = card.querySelector('.stop-title');
+  const stopNoteEl = card.querySelector('[data-field="note"]');
+  stopTitleEl.addEventListener('blur', ()=>{ stop.title = stopTitleEl.innerText; deactivateField(stopTitleEl); pushTripData(); });
+  stopNoteEl.addEventListener('blur', ()=>{ stop.note = stopNoteEl.innerText; deactivateField(stopNoteEl); pushTripData(); });
   card.querySelector('.del-stop').onclick=(e)=>{
     e.stopPropagation();
     if(!confirm('確定要刪除這個行程嗎？')) return;
@@ -1040,6 +1055,30 @@ function switchPanel(id){
 }
 
 /* ---------------- Edit mode ---------------- */
+function activateField(key){
+  const el = document.querySelector(`[data-field-target="${key}"]`);
+  if(!el) return;
+  el.setAttribute('contenteditable', 'true');
+  el.classList.add('field-active');
+  el.focus();
+  const range = document.createRange();
+  range.selectNodeContents(el);
+  range.collapse(false);
+  const sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(range);
+}
+function deactivateField(el){
+  if(!el) return;
+  el.setAttribute('contenteditable', 'false');
+  el.classList.remove('field-active');
+}
+
+document.addEventListener('click', (e)=>{
+  const btn = e.target.closest('[data-open-field]');
+  if(btn){ activateField(btn.dataset.openField); }
+});
+
 const fab = document.getElementById('fab');
 fab.onclick=()=>{
   const turningOn = !document.body.classList.contains('editing');
@@ -1047,7 +1086,10 @@ fab.onclick=()=>{
   const on = document.body.classList.toggle('editing');
   fab.classList.toggle('on', on);
   fab.textContent = on? '✓' : '✎';
-  document.querySelectorAll('[data-field]').forEach(el=> el.setAttribute('contenteditable', on? 'true':'false'));
+  if(!on){
+    // 關閉編輯模式時，把還在編輯中的欄位收起來
+    document.querySelectorAll('.field-active').forEach(el=> deactivateField(el));
+  }
 };
 
 /* ---------------- 分帳記帳 ---------------- */
